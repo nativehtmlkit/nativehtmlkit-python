@@ -200,4 +200,4 @@ tests/native/qualify-linuxdev.sh HOST SHA EVIDENCE    # lab: workstation + KDE W
 tests/native/qualify-windev.sh 'F:\...\nativehtmlkit-host.exe' SHA EVIDENCE   # lab: Windows SSH + RDP desktop
 ```
 
-Local only: no GitHub Actions, PyPI or remote publishing. See `docs/QUALIFICATION.md`.
+Builds and tests are local only. The one GitHub Actions workflow, `.github/workflows/pypi_publish.yml`, is publish-only: on manual dispatch it uploads the wheels of an existing GitHub Release to PyPI after verifying their checksums. No publication without explicit owner approval. See `docs/QUALIFICATION.md`.
