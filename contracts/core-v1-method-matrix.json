@@ -1,0 +1,473 @@
+{
+  "schema": 1,
+  "protocol_version": 1,
+  "generated_from": {
+    "requests": "crates/nativehtmlkit-host/src/host/requests.rs",
+    "documents": "crates/nativehtmlkit-host/src/host/documents.rs",
+    "bitmap": "crates/nativehtmlkit-host/src/host/bitmap.rs",
+    "commands": "crates/nativehtmlkit-host/src/host/document_commands.rs"
+  },
+  "generator": "scripts/generate-protocol-contract.py",
+  "runtime_golden": "protocol/v1/conformance/golden.json (crates/nativehtmlkit-host/tests/protocol_conformance.rs)",
+  "methods": {
+    "app.activate": {
+      "direction": "secondary-launcher->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "any JSON object up to 32 KiB, forwarded verbatim as app.activated params"
+      }
+    },
+    "app.activated": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "<secondary launcher payload>"
+      ]
+    },
+    "app.before_quit": {
+      "direction": "host->client",
+      "kind": "request",
+      "params": [
+        "reason"
+      ],
+      "reply": {
+        "allow": "boolean (missing/false/non-boolean = veto)"
+      }
+    },
+    "app.force_quit": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "app.ready": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "app.request_quit": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "app.shutdown": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "deadline_ms"
+      ]
+    },
+    "bitmap.close": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Close",
+        "schema": "schemas/methods/bitmap.close.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "bitmap.create": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Create",
+        "schema": "schemas/methods/bitmap.create.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "bitmap.present": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Present",
+        "schema": "schemas/methods/bitmap.present.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "clipboard.read_text": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "clipboard.write_text": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Text",
+        "schema": "schemas/methods/clipboard.write_text.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "desktop.open_external": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Target",
+        "schema": "schemas/methods/desktop.open_external.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "desktop.paths": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "desktop.preferences": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "desktop.preferences_changed": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "<native preferences snapshot>"
+      ]
+    },
+    "desktop.reveal_file": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "RevealFile",
+        "schema": "schemas/methods/desktop.reveal_file.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "dialog.choose_folder": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "DialogParams",
+        "schema": "schemas/methods/dialog.choose_folder.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "dialog.open_files": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "DialogParams",
+        "schema": "schemas/methods/dialog.open_files.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "dialog.save_file": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "DialogParams",
+        "schema": "schemas/methods/dialog.save_file.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "document.command": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "CommandRequest",
+        "schema": "schemas/methods/document.command.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "document.error": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "window_id",
+        "document_id",
+        "message"
+      ]
+    },
+    "document.event": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "window_id",
+        "document_id",
+        "event"
+      ]
+    },
+    "document.get": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "WindowDocument",
+        "schema": "schemas/methods/document.get.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "document.load": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "LoadDocument",
+        "schema": "schemas/methods/document.load.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "document.unload": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "DocumentKey",
+        "schema": "schemas/methods/document.unload.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "host.capabilities": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "host.diagnostics": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "host.hello": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": "manual",
+        "note": "hand-validated: token (string), protocol_version (1); other members ignored",
+        "schema": "schemas/methods/host.hello.params.schema.json"
+      }
+    },
+    "probe.get_text": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "WindowKey",
+        "schema": "schemas/methods/probe.get_text.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "probe.set_text": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "SetText",
+        "schema": "schemas/methods/probe.set_text.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "request.cancel": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Cancel",
+        "schema": "schemas/methods/request.cancel.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "request.cancelled": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "id",
+        "reason"
+      ]
+    },
+    "window.before_close": {
+      "direction": "host->client",
+      "kind": "request",
+      "params": [
+        "window_id",
+        "reason"
+      ],
+      "reply": {
+        "allow": "boolean (missing/false/non-boolean = veto)"
+      }
+    },
+    "window.create": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "CreateWindow",
+        "schema": "schemas/methods/window.create.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "window.event": {
+      "direction": "host->client",
+      "kind": "notification",
+      "params": [
+        "window_id",
+        "type",
+        "..."
+      ]
+    },
+    "window.get": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "WindowKey",
+        "schema": "schemas/methods/window.get.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "window.list": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": false,
+        "note": "params are not decoded; any JSON object (or omitted params) is accepted"
+      }
+    },
+    "window.request_attention": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "Attention",
+        "schema": "schemas/methods/window.request_attention.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "window.request_close": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "WindowKey",
+        "schema": "schemas/methods/window.request_close.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    },
+    "window.set": {
+      "direction": "client->host",
+      "kind": "request",
+      "params": {
+        "decoded": true,
+        "rust_type": "SetWindow",
+        "schema": "schemas/methods/window.set.params.schema.json",
+        "unknown_members": "rejected (-32602)"
+      }
+    }
+  },
+  "document_command_ops": [
+    "add_class",
+    "add_stylesheet",
+    "append_text",
+    "batch",
+    "blur",
+    "check_validity",
+    "clear_selection",
+    "close_dialog",
+    "copy_selection",
+    "css_profile",
+    "edit_command",
+    "element_at_point",
+    "explain",
+    "focus",
+    "get_accessibility_tree",
+    "get_attribute",
+    "get_attributes",
+    "get_checked",
+    "get_computed_style",
+    "get_control_selection",
+    "get_diagnostics",
+    "get_dialog",
+    "get_environment",
+    "get_files",
+    "get_focused_element",
+    "get_form_data",
+    "get_html",
+    "get_node",
+    "get_options",
+    "get_pointer_capture",
+    "get_popover",
+    "get_rect",
+    "get_resource_stats",
+    "get_scroll",
+    "get_selection",
+    "get_text",
+    "get_validity",
+    "get_value",
+    "has_element",
+    "hide_popover",
+    "insert_html",
+    "list_stylesheets",
+    "move_element",
+    "node_batch",
+    "node_children",
+    "node_of",
+    "purge_unused_resources",
+    "query",
+    "query_nodes",
+    "register_resource_bundle",
+    "remove_attribute",
+    "remove_class",
+    "remove_element",
+    "remove_stylesheet",
+    "replace_children_html",
+    "replace_control_range",
+    "replace_stylesheet",
+    "request_submit",
+    "reset_form",
+    "scroll_by",
+    "scroll_into_view",
+    "scroll_to",
+    "select_text",
+    "set_attribute",
+    "set_checked",
+    "set_control_selection",
+    "set_custom_validity",
+    "set_default_action",
+    "set_environment",
+    "set_pointer_capture",
+    "set_scroll_follow",
+    "set_selected_values",
+    "set_text",
+    "set_value",
+    "show_dialog",
+    "show_popover",
+    "text_at_point",
+    "text_rects",
+    "toggle_popover",
+    "trim_children",
+    "unregister_resource_bundle"
+  ]
+}

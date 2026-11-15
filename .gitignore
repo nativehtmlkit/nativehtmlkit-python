@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+*.egg-info/
+dist/
+build/
+.venv/
+verification/
+*.whl
+*.tar.gz
+src/nativehtmlkit/_bin/*
+!src/nativehtmlkit/_bin/README.md

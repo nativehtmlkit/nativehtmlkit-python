@@ -1,0 +1,5 @@
+{
+  "source": "nativehtmlkit-core/protocol/v1/method-matrix.json",
+  "sha256": "236aeb6deb7188bd8bd272a2e7db202336dfcb85fa4048711a73f443fd2a01a5",
+  "status": "candidate until Core protocol gate succeeds"
+}

@@ -1,0 +1,5 @@
+include README.md LICENSE
+recursive-include src/nativehtmlkit/_bin *
+recursive-include src/nativehtmlkit/_skills *
+
+recursive-include skills/nativehtmlkit-python *

@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=77", "wheel>=0.44"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nativehtmlkit"
+version = "0.1.0"
+description = "Python SDK for the NativeHTMLKit native HTML/CSS desktop host"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "NativeHTMLKit contributors"}]
+keywords = ["native", "desktop", "html", "css", "gui", "rust", "wayland", "windows"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux"
+]
+
+[project.urls]
+Homepage = "https://github.com/nativehtmlkit/nativehtmlkit-python"
+Source = "https://github.com/nativehtmlkit/nativehtmlkit-python"
+
+[project.scripts]
+nativehtmlkit-python = "nativehtmlkit.__main__:main"
+nativehtmlkit-python-host = "nativehtmlkit.launcher:main"
+nativehtmlkit-new = "nativehtmlkit.scaffold:main"
+nativehtmlkit-skill = "nativehtmlkit.skills:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["nativehtmlkit*"]
+
+[tool.setuptools.package-data]
+nativehtmlkit = ["_bin/*", "_bin/core-licenses/*", "_bin/core-licenses/licenses/*",
+                 "_skills/nativehtmlkit-python/*", "_skills/nativehtmlkit-python/references/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 120
+
+[tool.ruff]
+line-length = 110
+
+[dependency-groups]
+test = ["pytest>=8", "pytest-timeout>=2"]
