@@ -62,7 +62,9 @@ if (Test-Path '$W\wheel-for-desktop') { Remove-Item -Recurse -Force '$W\wheel-fo
 New-Item -ItemType Directory '$W\wheel-for-desktop' | Out-Null
 Get-ChildItem '$W\evidence-headless\dist-windows-x64-headless\*.whl', '$W\wheel-prebuilt\*.whl' -ErrorAction SilentlyContinue | Copy-Item -Destination '$W\wheel-for-desktop'
 icacls '$W' /grant "${USER_}:(OI)(CI)M" /T /C /Q | Out-Null
-& '$INTERACTIVE' -UserName $USER_ -ScriptPath '$W\qualify-desktop.ps1' -TimeoutSeconds 2400
+# -Hidden: no console window on the desktop that could cover the app or its native dialog
+# (a visible console once took the driver's activating click and Alt+F4 and ended the run).
+& '$INTERACTIVE' -UserName $USER_ -ScriptPath '$W\qualify-desktop.ps1' -TimeoutSeconds 2400 -Hidden
 Get-Content '$W\evidence-desktop.log' -Tail 60
 EOF
 cat > "$TMP/unpack.ps1" <<EOF

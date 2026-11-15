@@ -5,9 +5,11 @@ host: native HTML/CSS desktop windows, DOM/form/node operations, events, live bi
 services. **No browser, JavaScript, web server, PyO3 extension or Rust compiler** is needed by users of a
 platform wheel: the wheel embeds one prebuilt, SHA-256-pinned Core host. Pure standard library; Python ≥ 3.10.
 
-**Status: UNQUALIFIED development build (SDK 0.1.0, wire protocol v1 release candidate).** What has and has not
-been executed is recorded in [`docs/QUALIFICATION.md`](docs/QUALIFICATION.md). Nothing is published; do not
-advertise `pip install nativehtmlkit` until a qualified distribution exists.
+**Status: 0.1.0 prerelease published on GitHub Releases
+(<https://github.com/nativehtmlkit/nativehtmlkit-python/releases/tag/v0.1.0>); locally qualified on Linux KDE
+Wayland and an interactive Windows desktop (see [`docs/QUALIFICATION.md`](docs/QUALIFICATION.md)); wire protocol v1 is
+still a release candidate (`1.0-rc`); not on PyPI.** Install a downloaded wheel with
+`python -m pip install --no-index ./nativehtmlkit-0.1.0-py3-none-<platform>.whl`.
 
 ## Run an app
 

@@ -29,24 +29,41 @@ windows, the installed-wheel smoke with real windows and G6 on the KDE Wayland l
 G0/G2/G3/G4/G8 over admin SSH (Python 3.10 + 3.14) and then, inside the interactive RDP desktop of the test user,
 G3/G4 with real windows, installed-wheel smoke and G6. `NHK_GUI_LOCK` serialises shared desktops.
 
-## Current status
+## Current status: 0.1.0 release
 
-Authoritative evidence for the pinned Core 1.0.2 hosts (Linux `702adafc…741d2a`, Windows `64d4502f…8638f4`, both
-from Core source `4f63398c`) is Project `verification/2026-11-15-sdk/python/final2/` (`results.json`, `dist/` with
-`SHA256SUMS` and `dist-manifest.json`). It was produced after the independent final adversarial review
-(`verification/2026-11-15-sdk/final-review/PYTHON.md`, FR-PY-01..18) and its fixes; `final/` is kept but
-superseded by that review. The SDK stays **UNQUALIFIED** until the lead records the host+SDK pair; any FAIL or
-BLOCKED entry is listed with its reason in `results.json` and Project `verification/.../python/REVIEW.md`.
+Published as a GitHub prerelease: tag `v0.1.0` at commit `7559b5b1f1e678017895789fabe3a1a6f59d5a74`
+(source-tree SHA-256 `81d2171524de9fb9ba68377115cf2dca0255dd261a052e5b6c596357367ad1c7`), built from that clean commit
+against the clean Core 1.0.2 release directories (Core commit `8a09875cff58aa16b60573ffca24de4d611d60b3`). Not on PyPI;
+wire protocol v1 remains `1.0-rc`.
 
-Added gates since the review: backend output and the fatal traceback survive every diagnostics level including
-`off` (direct start and runner, real host); bundled-host SHA verification on every launch path; argument round-trip
-through the host manifest; reproducible packaging (two builds byte-identical) and the `manylinux_2_39_x86_64`
-tag refused by pip on an older glibc (Docker, glibc 2.36); the reviewer's 22 mutants re-run.
+| Artifact | SHA-256 |
+|---|---|
+| `nativehtmlkit-0.1.0-py3-none-manylinux_2_39_x86_64.whl` (host `702adafc…741d2a`) | `3073066c9ad5fba8a296ba3541110e43511a2c7a4eec5669a76d2113ab59642d` |
+| `nativehtmlkit-0.1.0-py3-none-win_amd64.whl` (host `64d4502f…8638f4`) | `183ba566d70e931c72ee28c73ae60890ede2e40d070ac26824c978bac2d867fc` |
+| `nativehtmlkit-0.1.0.tar.gz` (no host) | `5779033930aa9af1ba5812c5da19751e71b6f3cc0e2b05aca6039aedcee31bf1` |
 
-Desktop-mode BLOCKED by design: `test_malformed_frame_from_sdk_ends_session_causally` (a desktop host keeps its
-failure window open for the user; covered headless) and, on Windows, `test_scaffolded_app_starts_and_stops_on_sigterm`
-(SIGTERM relay is POSIX; Windows launcher kill + job object is covered by `test_examples`). The GUI driver reports
-BLOCKED when a foreign NativeHTMLKit window is on the shared desktop.
+Two builds from the commit were byte-identical. Evidence (Project, git-ignored):
+`verification/2026-11-15-sdk/python/release/results.json` — **187 PASS, 0 FAIL, 4 BLOCKED**, every entry on the
+tree hash above and the pinned hosts: Linux headless 38/0/0, Linux KDE Wayland desktop 56/0/1, Windows headless
+37/0/1, Windows interactive RDP desktop 55/0/2, reproducible dist build 1/0/0. Python 3.10–3.14 unit suites and
+offline clean-install smoke on both platforms; 29/29 native GUI checks per desktop with real input.
+
+BLOCKED by design: `test_malformed_frame_from_sdk_ends_session_causally` in desktop mode on both desktops (a desktop
+host keeps its failure window open for the user; it passes headless) and `test_scaffolded_app_starts_and_stops_on_sigterm`
+on Windows (SIGTERM relay is POSIX; launcher kill + job object is covered by `test_examples`).
+
+Deviation (Windows interactive): in the one-command run the interactive scheduled task ended with 0xC000013A
+(STATUS_CONTROL_C_EXIT) during the GUI stage. The task's own visible PowerShell console window lay above the native
+file dialog; the driver's activating click and the following Alt+F4 ("native close") hit that console and closed it.
+Desktop integration (26 PASS, 2 BLOCKED) and installed-wheel smoke had passed before that. The desktop stages were
+re-run with the same commit, host and wheel, changing only `start_interactive.ps1 -Hidden` (no console window):
+55 PASS, 0 FAIL, 2 BLOCKED. Both runs' evidence is kept (`win-results/windows-desktop/INTERRUPTED.md`,
+`win-results/windows-desktop-rerun/`). The harness now passes `-Hidden` by default (commit after `v0.1.0`; the
+released wheels were built from `7559b5b`, before this harness change).
+
+Earlier evidence (`final/`, `final2/`, attempts and rehearsals) is superseded by `release/` and kept for traceability.
+The independent final adversarial review (`verification/2026-11-15-sdk/final-review/PYTHON.md`, FR-PY-01..18) and its
+fixes are recorded in `verification/2026-11-15-sdk/python/REVIEW.md`.
 
 Known Core item affecting the SDK: NHK-CROSS-0007 (backend output relayed through the host log filter); the SDK's
 disclosed interim behaviour is described in the README ("Diagnostics").
