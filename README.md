@@ -4,9 +4,9 @@
 
 [PyPI package](https://pypi.org/project/nativehtmlkit/) · [Tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/todo-app.md) · [How-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md) · [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) · [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) · [Public developer guide](https://github.com/nativehtmlkit/nativehtmlkit)
 
-![Illustrative NativeHTMLKit application gallery, not an actual captured desktop screenshot](https://raw.githubusercontent.com/nativehtmlkit/nativehtmlkit/main/assets/demo-placeholder.png)
+![Real NativeHTMLKit python-sdk gallery captured on linux](https://raw.githubusercontent.com/nativehtmlkit/nativehtmlkit/main/assets/python-sdk-linux.png)
 
-*Illustration only — not a verified screenshot. Run the [real gallery demo](https://github.com/nativehtmlkit/nativehtmlkit/tree/main/examples/python-sdk) to inspect the actual application. The illustration will be replaced after interactive desktop verification.*
+*Reviewed desktop screenshot captured on linux. Run the [demo](https://github.com/nativehtmlkit/nativehtmlkit/tree/main/examples/python-sdk) to test it on your system.*
 
 ## Install
 

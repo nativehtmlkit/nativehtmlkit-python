@@ -59,3 +59,18 @@ exercised on a real desktop.
 - [How-to guides](../docs/guides/README.md) and [API reference](../docs/API.md)
 - The [public gallery demo](https://github.com/nativehtmlkit/nativehtmlkit/tree/main/examples/python-sdk)
 - For reusable components and reactive state, the [Python UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui)
+
+## Screenshots
+
+Real captures on KDE Plasma 6.6 Wayland (100% scaling) with Core 1.0.3, Python SDK 0.1.2, taken by running each example unchanged. Windows looks the same apart from the window frame.
+
+| | |
+|---|---|
+| [async_counter](async_counter.py)<br>![async_counter](../docs/images/examples/py-sdk-async_counter.png) | [async_jobs](async_jobs.py)<br>![async_jobs](../docs/images/examples/py-sdk-async_jobs.png) |
+| [checksum](checksum.py)<br>![checksum](../docs/images/examples/py-sdk-checksum.png) | [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) |
+| [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) | [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) |
+| [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) | [hello](hello.py)<br>![hello](../docs/images/examples/py-sdk-hello.png) |
+| [live_chart](live_chart.py)<br>![live_chart](../docs/images/examples/py-sdk-live_chart.png) | [log_viewer](log_viewer.py)<br>![log_viewer](../docs/images/examples/py-sdk-log_viewer.png) |
+| [settings_dialog](settings_dialog.py)<br>![settings_dialog](../docs/images/examples/py-sdk-settings_dialog.png) | [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) |
+| [text_toolbox](text_toolbox.py)<br>![text_toolbox](../docs/images/examples/py-sdk-text_toolbox.png) | [todo](todo.py)<br>![todo](../docs/images/examples/py-sdk-todo.png) |
+| [window_manager](window_manager.py)<br>![window_manager](../docs/images/examples/py-sdk-window_manager.png) |  |
