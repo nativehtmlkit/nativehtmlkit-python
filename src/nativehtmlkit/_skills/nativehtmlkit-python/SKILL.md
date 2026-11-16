@@ -1,7 +1,26 @@
-# NativeHTMLKit Python SDK — Coding Agent Reference
+---
+name: nativehtmlkit-python
+description: Build native HTML/CSS desktop applications using the public NativeHTMLKit Python SDK on Linux KDE Wayland or Windows.
+---
 
-Read the `nativehtmlkit-python` repository's `AGENTS.md`, public Core v1 contract, and package README.
-Use `Application.from_environment()` when launched by Core; `Application.start()` for direct scripts; `python -m nativehtmlkit run MODULE:CALLABLE` to avoid double-running module initialization.
-Use `AsyncRpcClient` or `AsyncApplication` with `asyncio` for nonblocking callbacks. The host's native event loop is independent from the SDK transport; never block callback dispatch with long work.
-Keep UI components, plugins, and application logic outside this repository.
-Never include secrets, RPC params/results, or user text in debug reports. Run local tests; never use GitHub Actions.
+# NativeHTMLKit Python SDK
+
+Use `nativehtmlkit` package (Python 3.10+). Always check SDK version, host compatibility and target desktop. This skill is for **SDK** objects (`Application`, `Window`, `Document`), not the reactive UI library.
+
+## First window
+
+```python
+from nativehtmlkit import Application
+with Application.start(name='Hello') as app:
+    w = app.open_html('<button id="go">Click</button><p id="out">Ready</p>')
+    w.document.on('click', lambda e: w.document.set_text('out', 'Clicked'), element='go')
+    app.run()
+```
+
+`Application.start()` starts a supervised host and may rerun the script in the backend; avoid side effects before it. An alternative `python -m nativehtmlkit run module:main` accepts `main(app)` and launches the backend once.
+
+Use public document helpers, `on` unsubscribe, `Window.open_files/save_file/choose_folder`, `Document.show_dialog`, `Document.create_bitmap` with RGBA8. Treat stale generation handles as errors; do not assume native dialogs exist in headless sessions.
+
+## Architecture guardrails
+
+Never import SDK private modules, access Core Rust internals, call a CLI as the transport, add a browser/JS server, or change Core from an SDK task. For components and reactive state, use the separate `nativehtmlkit-ui-python` skill. See [examples](references/examples.md) and [full documentation](https://github.com/nativehtmlkit/nativehtmlkit-python).

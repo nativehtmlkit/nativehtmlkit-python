@@ -2,7 +2,7 @@
 
 **Native desktop windows from ordinary Python and local HTML/CSS.** The Rust Core host draws the interface; Python handles application logic and events. No browser, JavaScript, HTTP server, or Node.js runtime is required.
 
-[PyPI package](https://pypi.org/project/nativehtmlkit/) · [Public developer guide](https://github.com/nativehtmlkit/nativehtmlkit) · [API reference](docs/API.md) · [Examples](examples/hello.py)
+[PyPI package](https://pypi.org/project/nativehtmlkit/) · [Public developer guide](https://github.com/nativehtmlkit/nativehtmlkit) · [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) · [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/hello.py)
 
 ![Illustrative NativeHTMLKit application gallery, not an actual captured desktop screenshot](https://raw.githubusercontent.com/nativehtmlkit/nativehtmlkit/main/assets/demo-placeholder.png)
 
@@ -53,14 +53,14 @@ For layouts, reactive state and reusable controls, use the separate [Python UI l
 
 | Guide | Purpose |
 |---|---|
-| [API reference](docs/API.md) | Real public Python objects, methods and error handling |
-| [Architecture](docs/ARCHITECTURE.md) | Lifecycle, host, IPC and threading |
-| [Examples](docs/EXAMPLES.md) | Next steps and the interactive demo gallery |
-| [Build and testing](docs/BUILD.md) | Release source, wheels and qualification |
+| [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) | Real public Python objects, methods and error handling |
+| [Architecture](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/ARCHITECTURE.md) | Lifecycle, host, IPC and threading |
+| [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/EXAMPLES.md) | Next steps and the interactive demo gallery |
+| [Build and testing](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/BUILD.md) | Release source, wheels and qualification |
 | [Public tutorials](https://github.com/nativehtmlkit/nativehtmlkit) | Screenshots, learning path and capability matrix |
-| [Skill](skills/nativehtmlkit-python/SKILL.md) | Agent instructions to build a Python app |
+| [Skill](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/skills/nativehtmlkit-python/SKILL.md) | Agent instructions to build a Python app |
 
-**Released package:** 0.1.1. This README update does not mean a newer wheel has been published; a marketplace description update requires its own verified patch release.
+**Package version:** 0.1.2 (bundles NativeHTMLKit Core 1.0.3, public wire protocol v1). 0.1.2 refreshes documentation and the bundled agent skill; the SDK API is unchanged from 0.1.1.
 
 ## Project navigation
 
