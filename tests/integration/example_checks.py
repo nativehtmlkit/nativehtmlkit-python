@@ -253,7 +253,7 @@ def file_viewer(app):
 
 
 # --------------------------------------------------------------------------- window manager
-def window_manager(app):
+def multi_window(app):
     import window_manager as example
 
     manager = example.build(app)
@@ -318,7 +318,7 @@ def live_chart(app):
 
 
 # --------------------------------------------------------------------------- text toolbox
-def text_toolbox(app):
+def clipboard_tool(app):
     import text_toolbox as example
 
     box = example.build(app)
@@ -356,7 +356,7 @@ def text_toolbox(app):
 
 
 # --------------------------------------------------------------------------- async jobs
-async def async_jobs(app):
+async def background_jobs(app):
     import async_jobs as example
 
     window = await asyncio.to_thread(app.open_html, example.PAGE, title="Async jobs check")
@@ -391,7 +391,7 @@ async def async_jobs(app):
 UNSAFE_NAME = "sub/b & <x>.bin" if os.name != "nt" else "sub/b & 'x' &amp;.bin"
 
 
-def checksum(app):
+def checksums(app):
     import checksum as example
 
     tool = example.build(app)
@@ -515,3 +515,317 @@ def focus_timer(app):
             app.on_shutdown(lambda: check("timer.stats_saved_on_shutdown",
                                           json.loads(stats.read_text(encoding="utf-8")) == {"completed": 1}))
     quit_when_ready(app, delay=0.2, then=after_ready)
+
+
+# --------------------------------------------------------------------------- helpers for subfolder examples
+def _load(relative: str, name: str):
+    """Import examples/<relative> under ``name``; its folder goes on sys.path for sibling imports."""
+    import importlib.util
+    import sys
+
+    path = Path(__file__).resolve().parents[2] / "examples" / relative
+    if str(path.parent) not in sys.path:
+        sys.path.insert(0, str(path.parent))
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _attribute(document, element: str, name: str):
+    return document.command("get_attribute", element=element, name=name)["value"]
+
+
+# --------------------------------------------------------------------------- hello
+def hello(app):
+    import hello as example
+
+    doc = example.build(app)
+    with Guard("hello"):
+        check("hello.initial_text", doc.get_text("greeting") == "Type a name and press Greet.")
+        doc.set_value("name", "  <b>Ada</b> ")
+        example.greet(doc)
+        check("hello.greeting_plain_text", doc.get_text("greeting") == "Hello, <b>Ada</b>!"
+              and _count(doc, "#greeting b") == 0, text=doc.get_text("greeting"))
+        doc.set_value("name", "   ")
+        example.greet(doc)
+        check("hello.empty_name_greets_world", doc.get_text("greeting") == "Hello, world!")
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- counter
+def counter(app):
+    import counter as example
+
+    counter = example.build(app)
+    doc = counter.document
+    with Guard("counter"):
+        counter.on_click({"element": "inc"})
+        check("counter.increment_via_handler", doc.get_text("value") == "1")
+        doc.set_selected_values("step", ["10"])
+        check("counter.step_read_from_select", counter.step() == 10)
+        for _ in range(7):
+            counter.on_click({"element": "dec"})
+        check("counter.clamped_to_minimum", doc.get_text("value") == "-50", text=doc.get_text("value"))
+        classes = _attribute(doc, "value", "class") or ""
+        check("counter.classes_from_batch", "negative" in classes and "at-limit" in classes, classes=classes)
+        check("counter.history_entries", _count(doc, "#history li") == 8)
+        counter.on_click({"element": "reset"})
+        counter.set_count(3, "+3")
+        check("counter.history_trimmed_to_8", _count(doc, "#history li") == example.HISTORY)
+        check("counter.newest_first_and_escaped", doc.get_text("history").startswith("+3 -> 3"),
+              text=doc.get_text("history")[:40])
+        classes = _attribute(doc, "value", "class") or ""
+        check("counter.classes_removed", "negative" not in classes and "at-limit" not in classes, classes=classes)
+        counter.on_click({"element": "step"})          # a click on the select changes nothing
+        check("counter.other_clicks_ignored", doc.get_text("value") == "3")
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- process viewer
+def process_viewer(app):
+    import process_viewer as example
+
+    viewer = example.build(app)
+    doc = viewer.document
+    with Guard("processes"):
+        total = _count(doc, "#rows tr")
+        check("processes.rows_rendered", total >= 2, rows=total)
+        check("processes.status_counts", doc.get_text("status").startswith(f"Showing {total} of "))
+        check("processes.default_sort_memory", _attribute(doc, "col-MemoryMB", "aria-sort") == "descending")
+        viewer.on_filter({"value": f" {os.getpid()} "})       # this backend's own process id
+        check("processes.pid_filter_one_row", _count(doc, "#rows tr") == 1)
+        viewer.on_filter({"value": ""})
+        viewer.on_header({"element": "sort-Name"})
+        check("processes.sort_name_ascending", _attribute(doc, "col-Name", "aria-sort") == "ascending"
+              and _attribute(doc, "col-MemoryMB", "aria-sort") == "none")
+        names = [p.name.lower() for p in viewer.visible()]
+        check("processes.sorted_by_name", names == sorted(names))
+        viewer.on_header({"element": "sort-Name"})
+        check("processes.sort_toggles", _attribute(doc, "col-Name", "aria-sort") == "descending")
+        viewer.snapshot = [example.Process("<b>evil</b> & co", 4242, 1.5, 0.25)]
+        viewer.render()
+        check("processes.names_escaped", _count(doc, "#rows b") == 0 and "<b>evil</b> & co" in doc.get_text("rows"))
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- keyboard shortcuts
+def keyboard_shortcuts(app):
+    import keyboard_shortcuts as example
+
+    path = _scratch() / "snippet.txt"
+    path.write_text("saved earlier", encoding="utf-8")
+    editor = example.build(app, path)
+    doc = editor.document
+
+    def press(key, **modifiers):
+        editor.on_key({"type": "keydown", "key": key, "ctrl": False, "shift": False, "alt": False, "meta": False,
+                       **modifiers})
+    with Guard("keys"):
+        check("keys.loads_file", doc.get_value("editor") == "saved earlier")
+        check("keys.chord_names", example.chord({"key": "U", "ctrl": True, "shift": True}) == "ctrl+shift+u")
+        doc.set_value("editor", "ab")
+        doc.set_control_selection("editor", 1, 1)
+        press("Tab")
+        check("keys.tab_indents_at_caret", doc.get_value("editor") == "a    b", value=doc.get_value("editor"))
+        doc.set_control_selection("editor", 0, 1)
+        press("U", ctrl=True, shift=True)
+        check("keys.upper_case_selection", doc.get_value("editor") == "A    b")
+        doc.set_value("editor", "\U0001F600ab")             # the emoji is two UTF-16 units
+        doc.set_control_selection("editor", 2, 3)
+        press("U", ctrl=True, shift=True)
+        check("keys.utf16_offsets", doc.get_value("editor") == "\U0001F600Ab", value=doc.get_value("editor"))
+        doc.set_control_selection("editor", 1 + 2, 3)
+        press("U", ctrl=True, shift=True)
+        check("keys.empty_selection_message", doc.get_text("status") == "Select some text first.")
+        press("s", ctrl=True)
+        check("keys.ctrl_s_saves", path.read_text(encoding="utf-8") == "\U0001F600Ab"
+              and doc.get_text("status").startswith("Saved "))
+        doc.set_value("editor", "")
+        press("l", ctrl=True)
+        check("keys.ctrl_l_timestamp", len(doc.get_value("editor")) == len("2026-01-01 00:00"),
+              value=doc.get_value("editor"))
+        press("F1")
+        check("keys.f1_opens_help", doc.command("get_popover", element="help")["open"] is True)
+        press("Escape")
+        check("keys.escape_closes_help", doc.command("get_popover", element="help")["open"] is False)
+        press("x", alt=True)                              # unknown chord: nothing happens
+        check("keys.unknown_chord_ignored", doc.command("get_popover", element="help")["open"] is False)
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- diagnostics
+def diagnostics(app):
+    import zipfile
+
+    import diagnostics as example
+
+    output = _scratch()
+    window = example.build(app, output)
+    doc = window.document
+    with Guard("diagnostics"):
+        counters = window.refresh()
+        check("diagnostics.no_callback_failures", counters["Callback failures"] == 0, counters=counters)
+        check("diagnostics.feature_rows", _count(doc, "#features tr") == len(example.FEATURES))
+        check("diagnostics.host_rows", _count(doc, "#host tr") == 8 and "linux" in doc.get_text("host")
+              or os.name == "nt")
+        if _headless(app):
+            check("diagnostics.headless_reported", "HeadlessTrue" in doc.get_text("host"),
+                  text=doc.get_text("host"))
+            check("diagnostics.features_unavailable_headless", _count(doc, "#features td.no") == len(example.FEATURES))
+        path = window.export()
+        check("diagnostics.bundle_written", path is not None and path.is_file() and path.parent == output)
+        with zipfile.ZipFile(path) as archive:
+            names = sorted(archive.namelist())
+        check("diagnostics.bundle_entries", names == ["manifest.json", "timeline.jsonl"], names=names)
+        check("diagnostics.status_text", doc.get_text("bundle").startswith("Saved ")
+              and doc.get_text("bundle").endswith("Attach it to a bug report."))
+        window.output = path            # a file, not a folder: the export must fail visibly
+        check("diagnostics.export_error_reported", window.export() is None
+              and doc.get_text("bundle").startswith("Could not save the bundle"))
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- bulk rename
+def bulk_rename(app):
+    example = _load("bulk_rename/app.py", "bulk_rename_app")
+    folder = _scratch()
+    for name in ("IMG_0001.jpg", "IMG_0002.jpg", "img_0003.JPG", "notes.txt", "holiday_0001.jpg"):
+        (folder / name).write_text(name, encoding="utf-8")
+    tool = example.build(app, str(folder))
+    doc = tool.document
+
+    def rule(find, replace, *, regex=False, case=False):
+        doc.set_value("find", find)
+        doc.set_value("replace", replace)
+        doc.set_checked("regex", regex)
+        doc.set_checked("case", case)
+        tool.update_preview()      # set_value does not fire input events
+        return doc.get_text("summary")
+    with Guard("rename"):
+        check("rename.folder_listed", _count(doc, "#preview tr") == 5 and doc.get_text("summary") == "5 file(s), 0 to rename")
+        check("rename.apply_disabled_without_plan", _attribute(doc, "apply", "disabled") is not None)
+        summary = rule(r"^img_(\d+)", r"photo-\1", regex=True)
+        check("rename.regex_preview", summary == "5 file(s), 3 to rename", summary=summary)
+        check("rename.regex_groups", "photo-0003.JPG" in doc.get_text("preview"))
+        check("rename.apply_enabled", _attribute(doc, "apply", "disabled") is None and doc.get_text("apply") == "Rename 3")
+        summary = rule(r"^img_(\d+)", r"photo-\1", regex=True, case=True)
+        check("rename.match_case", summary == "5 file(s), 1 to rename", summary=summary)
+        rule("(", "", regex=True)
+        check("rename.invalid_pattern", _count(doc, "#preview tr.error") == 5
+              and doc.get_text("summary") == "5 file(s), 0 to rename, 5 skipped")
+        rule("holiday", "IMG")
+        check("rename.conflict_detected", _count(doc, "#preview tr.conflict") == 1)
+        rule("notes", "a/b")
+        check("rename.invalid_name", _count(doc, "#preview tr.invalid") == 1)
+        rule("IMG_", "2026 $ \\1 ")
+        check("rename.literal_replacement", "2026 $ \\1 0001.jpg" in doc.get_text("preview"))
+        rule("IMG_", "2026 $ ")
+        tool.ask_confirmation()
+        check("rename.confirm_dialog_open", doc.command("get_dialog", element="confirm")["open"] is True
+              and doc.get_text("confirm-text") == f"Rename 3 file(s) in {tool.folder}?")
+        tool.confirm(True)
+        check("rename.dialog_closed", doc.command("get_dialog", element="confirm")["open"] is False)
+        names = sorted(p.name for p in folder.iterdir())
+        check("rename.files_renamed", {"2026 $ 0001.jpg", "2026 $ 0002.jpg", "2026 $ 0003.JPG"} <= set(names), names=names)
+        check("rename.summary_after", doc.get_text("summary") == "Renamed 3 file(s).")
+        check("rename.undo_enabled", _attribute(doc, "undo", "disabled") is None)
+        tool.undo()
+        check("rename.undo_restores", doc.get_text("summary") == "Restored 3 file name(s)."
+              and (folder / "img_0003.JPG").is_file() and (folder / "IMG_0001.jpg").is_file())
+        tool.ask_confirmation()
+        tool.confirm(False)
+        check("rename.cancel_keeps_files", (folder / "IMG_0001.jpg").is_file())
+        (folder / "2026 $ 0002.jpg").write_text("blocker", encoding="utf-8")   # appears after the preview
+        tool.update_preview()
+        tool.plan = [example.Row("IMG_0002.jpg", "2026 $ 0002.jpg", "rename")]
+        tool.rename()
+        check("rename.existing_target_not_overwritten", (folder / "IMG_0002.jpg").is_file()
+              and (folder / "2026 $ 0002.jpg").read_text(encoding="utf-8") == "blocker"
+              and doc.get_text("summary").startswith("Renamed 0 file(s). 1 failed"), text=doc.get_text("summary"))
+        tool.open_folder(str(folder / "missing"))
+        check("rename.missing_folder", doc.get_text("summary") == "That folder does not exist.")
+        if _headless(app):
+            check("rename.browse_disabled_headless", _attribute(doc, "browse", "disabled") is not None)
+            tool.browse()
+            check("rename.browse_fallback", _wait(lambda: doc.get_text("summary")
+                                                   == "Native file dialogs are not available in this session."))
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- process dashboard
+def process_dashboard(app):
+    example = _load("process_dashboard/dashboard.py", "process_dashboard_app")
+    dashboard = example.build(app, refresh_seconds=1)
+    doc = dashboard.document
+    with Guard("dashboard"):
+        thread = dashboard.start()
+        check("dashboard.first_refresh", _wait(lambda: dashboard.refreshes >= 1
+                                               and doc.get_text("status").startswith("Updated "), 10))
+        rows = _count(doc, "#rows tr")
+        check("dashboard.rows", 0 < rows <= example.SHOWN, rows=rows)
+        check("dashboard.summary", doc.get_text("summary").startswith(f"Showing {rows} of "))
+        check("dashboard.keeps_refreshing", _wait(lambda: dashboard.refreshes >= 2, 5))
+        dashboard.on_pause({"checked": True})
+        time.sleep(0.2)
+        paused_at = dashboard.refreshes
+        check("dashboard.paused_status", doc.get_text("status") == "Paused")
+        time.sleep(1.6)
+        check("dashboard.pause_stops_refresh", dashboard.refreshes == paused_at, before=paused_at,
+              after=dashboard.refreshes)
+        with dashboard.lock:
+            dashboard.rows = [example.list_processes.__globals__["Process"]("<i>x</i>", 7, 2.0, 1.0)]
+        doc.set_value("filter", "<I>")
+        dashboard.update_view()
+        check("dashboard.filter_and_escape", _count(doc, "#rows tr") == 1 and _count(doc, "#rows i") == 0
+              and "<i>x</i>" in doc.get_text("rows"))
+        doc.set_value("filter", "")
+        dashboard.copy()
+        if _headless(app):
+            check("dashboard.copy_fallback", doc.get_text("status") == "The clipboard is not available in this session")
+        else:
+            check("dashboard.copy", doc.get_text("status") == "Copied 1 rows")
+        dashboard.on_pause({"checked": False})
+        check("dashboard.resume_refreshes_at_once", _wait(lambda: dashboard.refreshes > paused_at, 0.9))
+        dashboard.stop()
+        thread.join(5)
+        check("dashboard.thread_stops", not thread.is_alive())
+    quit_when_ready(app, delay=0.2)
+
+
+def tutorial_dashboard_step1(app):
+    example = _load("process_dashboard/step1_snapshot.py", "process_dashboard_step1")
+    doc = example.build(app)
+    with Guard("dashboard_step1"):
+        rows = _count(doc, "#rows tr")
+        check("dashboard_step1.top_15", 0 < rows <= 15, rows=rows)
+    quit_when_ready(app, delay=0.2)
+
+
+def tutorial_dashboard_step2(app):
+    example = _load("process_dashboard/step2_filter.py", "process_dashboard_step2")
+    doc = example.build(app)
+    with Guard("dashboard_step2"):
+        check("dashboard_step2.summary", doc.get_text("summary").startswith("Showing "))
+        doc.set_selected_values("sort", ["name"])
+        doc.set_value("filter", "no-such-process-name")
+        example.update_view(doc)
+        check("dashboard_step2.filter_empty", _count(doc, "#rows tr") == 0
+              and doc.get_text("summary").startswith("Showing 0 of "))
+    quit_when_ready(app, delay=0.2)
+
+
+# --------------------------------------------------------------------------- async counter
+async def async_counter(app):
+    import async_counter as example
+
+    window = await asyncio.to_thread(app.open_html, example.HTML, title="Async counter check")
+    counter = example.AsyncCounter(app, window)
+    with Guard("async_counter"):
+        await counter.increment({})
+        await counter.increment({})
+        text = await asyncio.to_thread(window.document.get_text, "count")
+        check("async_counter.awaitable_updates", text == "2" and counter.count == 2, text=text)
+    quit_when_ready(app, delay=0.2)
+    await counter.adapter.run()

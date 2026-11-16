@@ -1,4 +1,8 @@
-"""Every file in examples/ (and the tutorial steps in examples/tutorial/) must start against the real host, reach app.ready and stop cleanly.
+"""Every example in examples/catalog.toml (and every tutorial step) must start against the real host, reach app.ready and stop cleanly.
+
+The catalogue is the list of examples: ``test_catalog_*`` fail when an entry is incomplete, when
+its file is missing, or when a program under examples/ is neither a catalogue entry, a tutorial
+step nor a declared helper module.
 
 Readiness is observed from the SDK's own trace record (``rpc.completed`` for ``app.ready``).
 POSIX: SIGTERM to the launcher (documented exit 143). Windows: the launcher is killed
@@ -17,13 +21,33 @@ from pathlib import Path
 
 import pytest
 
+import example_catalog
 from test_real_host import DESKTOP, EXPORT_HOST, HOST, INSTALLED, SRC, _marker_processes
 
-_ROOT = Path(__file__).resolve().parents[2] / "examples"
-EXAMPLES = sorted(_ROOT.glob("*.py")) + sorted((_ROOT / "tutorial").glob("*.py"))
-pytestmark = pytest.mark.skipif(not HOST, reason="BLOCKED: no host (set NATIVEHTMLKIT_HOST_BINARY)")
+_ROOT = example_catalog.EXAMPLES
+EXAMPLES = [_ROOT / name for name in example_catalog.runnable_files()]
+needs_host = pytest.mark.skipif(not HOST, reason="BLOCKED: no host (set NATIVEHTMLKIT_HOST_BINARY)")
 
 
+def test_catalog_entries_are_complete_and_unique():
+    entries = example_catalog.load()
+    ids = [entry["id"] for entry in entries]
+    assert len(ids) == len(set(ids)), ids
+    for entry in entries:
+        missing = example_catalog.REQUIRED_KEYS - entry.keys()
+        assert not missing, (entry.get("id"), missing)
+        assert (_ROOT / entry["file"]).is_file(), entry["file"]
+        assert entry["run"].endswith(entry["file"]), entry
+
+
+def test_every_program_is_catalogued():
+    known = set(example_catalog.runnable_files()) | set(example_catalog.HELPERS)
+    uncovered = [name for name in example_catalog.python_files_on_disk() if name not in known]
+    assert not uncovered, f"add these to examples/catalog.toml (or TUTORIAL_STEPS/HELPERS): {uncovered}"
+    assert all((_ROOT / name).is_file() for name in known), sorted(n for n in known if not (_ROOT / n).is_file())
+
+
+@needs_host
 @pytest.mark.parametrize("example", EXAMPLES, ids=[p.relative_to(_ROOT).with_suffix("").as_posix() for p in EXAMPLES])
 def test_example_reaches_ready_and_stops(tmp_path, example):
     marker = uuid.uuid4().hex[:12]

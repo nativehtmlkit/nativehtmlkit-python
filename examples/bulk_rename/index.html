@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bulk rename</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="row">
+    <label for="folder">Folder</label>
+    <input id="folder" autocomplete="off" spellcheck="false">
+    <button id="browse" type="button">Browse...</button>
+    <button id="load" type="button">Load</button>
+  </div>
+  <form id="rule" class="row">
+    <label for="find">Find</label>
+    <input id="find" name="find" autocomplete="off" spellcheck="false">
+    <label for="replace">Replace with</label>
+    <input id="replace" name="replace" autocomplete="off" spellcheck="false">
+    <label class="check"><input type="checkbox" id="regex" name="regex"> Regular expression</label>
+    <label class="check"><input type="checkbox" id="case" name="case"> Match case</label>
+  </form>
+</header>
+
+<main>
+  <table>
+    <thead><tr><th>Current name</th><th>New name</th><th>Status</th></tr></thead>
+    <tbody id="preview"></tbody>
+  </table>
+</main>
+
+<footer>
+  <span id="summary" role="status">Choose a folder to begin.</span>
+  <button id="undo" type="button" disabled>Undo last rename</button>
+  <button id="apply" type="button" class="primary" disabled>Rename</button>
+</footer>
+
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <h2 id="confirm-title">Rename files?</h2>
+  <p id="confirm-text"></p>
+  <div class="actions">
+    <button id="confirm-no" type="button">Cancel</button>
+    <button id="confirm-yes" type="button" class="primary">Rename</button>
+  </div>
+</dialog>
+</body>
+</html>
