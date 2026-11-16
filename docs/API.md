@@ -6,10 +6,14 @@ v1; Python 3.10+). Everything listed here is importable from `nativehtmlkit` unl
 ```python
 from nativehtmlkit import Application
 
-with Application.start(name="Hello") as app:
-    window = app.open_html('<button id="go">Go</button><p id="out">Ready</p>')
-    window.document.on("click", lambda event: window.document.set_text("out", "Clicked"), element="go")
-    app.run()
+def main() -> None:
+    with Application.start(name="Hello") as app:
+        window = app.open_html('<button id="go">Go</button><p id="out">Ready</p>')
+        window.document.on("click", lambda event: window.document.set_text("out", "Clicked"), element="go")
+        app.run()
+
+if __name__ == "__main__":
+    main()
 ```
 
 The object model is `Application → Window → Document → Node`. The Rust host owns windows,
