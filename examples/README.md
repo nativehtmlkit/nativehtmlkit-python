@@ -119,12 +119,18 @@ exercised on a real desktop.
 
 ## Screenshots
 
-Real captures on KDE Plasma 6.6 Wayland (100% scaling) with Core 1.0.3, Python SDK 0.1.2, taken by
-running each example unchanged. Examples without a picture here changed after the last capture. Windows looks the same apart from the window frame.
+Real captures on KDE Plasma 6.6 Wayland (100% scaling) with Core 1.0.3 and Python SDK 0.1.2, taken by running each example unchanged. Windows looks the same apart from the window frame.
 
 | | |
 |---|---|
-| [async_counter](async_counter.py)<br>![async_counter](../docs/images/examples/py-sdk-async_counter.png) | [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) |
-| [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) | [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) |
-| [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) | [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) |
-| [todo](todo.py)<br>![todo](../docs/images/examples/py-sdk-todo.png) | [window_manager](window_manager.py)<br>![window_manager](../docs/images/examples/py-sdk-window_manager.png) |
+| [Hello](hello.py)<br>![Hello](../docs/images/examples/py-sdk-hello.png) | [Counter](counter.py)<br>![Counter](../docs/images/examples/py-sdk-counter.png) |
+| [Todo list](todo.py)<br>![Todo list](../docs/images/examples/py-sdk-todo.png) | [Sign-up form](signup_form.py)<br>![Sign-up form](../docs/images/examples/py-sdk-signup_form.png) |
+| [Inventory data table](data_table.py)<br>![Inventory data table](../docs/images/examples/py-sdk-data_table.png) | [Process viewer](process_viewer.py)<br>![Process viewer](../docs/images/examples/py-sdk-process_viewer.png) |
+| [Log viewer](log_viewer.py)<br>![Log viewer](../docs/images/examples/py-sdk-log_viewer.png) | [File viewer](file_viewer.py)<br>![File viewer](../docs/images/examples/py-sdk-file_viewer.png) |
+| [Multiple windows](window_manager.py)<br>![Multiple windows](../docs/images/examples/py-sdk-window_manager.png) | [Settings dialog](settings_dialog.py)<br>![Settings dialog](../docs/images/examples/py-sdk-settings_dialog.png) |
+| [Clipboard tool](text_toolbox.py)<br>![Clipboard tool](../docs/images/examples/py-sdk-text_toolbox.png) | [Checksums](checksum.py)<br>![Checksums](../docs/images/examples/py-sdk-checksum.png) |
+| [Live chart](live_chart.py)<br>![Live chart](../docs/images/examples/py-sdk-live_chart.png) | [Snippet editor](keyboard_shortcuts.py)<br>![Snippet editor](../docs/images/examples/py-sdk-keyboard_shortcuts.png) |
+| [About and support](diagnostics.py)<br>![About and support](../docs/images/examples/py-sdk-diagnostics.png) | [DOM explorer](dom_explorer.py)<br>![DOM explorer](../docs/images/examples/py-sdk-dom_explorer.png) |
+| [Focus timer](focus_timer.py)<br>![Focus timer](../docs/images/examples/py-sdk-focus_timer.png) | [Background jobs](async_jobs.py)<br>![Background jobs](../docs/images/examples/py-sdk-async_jobs.png) |
+| [Bulk rename](bulk_rename/app.py)<br>![Bulk rename](../docs/images/examples/py-sdk-bulk_rename.png) | [Process dashboard](process_dashboard/dashboard.py)<br>![Process dashboard](../docs/images/examples/py-sdk-process_dashboard.png) |
+| [Async counter](async_counter.py)<br>![Async counter](../docs/images/examples/py-sdk-async_counter.png) |  |
