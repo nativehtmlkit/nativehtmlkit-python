@@ -1,4 +1,4 @@
-"""Text toolbox: transform text and move it through the system clipboard.
+"""Clipboard tool: transform text and move it through the system clipboard.
 
 What it teaches
   * ``Application.clipboard_text`` / ``set_clipboard_text`` (plain text only)
@@ -49,7 +49,7 @@ PAGE = """<!doctype html>
   a { color:#2d6be0; }
 </style></head>
 <body>
-  <h1>Text toolbox</h1>
+  <h1>Clipboard tool</h1>
   <div class="toolbar" id="toolbar">
     <button id="t-upper">UPPER</button><button id="t-lower">lower</button><button id="t-title">Title</button>
     <button id="t-trim">Trim lines</button><button id="t-sort">Sort lines</button>
@@ -145,11 +145,11 @@ class Toolbox:
 
 
 def build(app: Application) -> Toolbox:
-    return Toolbox(app, app.open_html(PAGE, title="Text toolbox", width=720, height=560))
+    return Toolbox(app, app.open_html(PAGE, title="Clipboard tool", width=720, height=560))
 
 
 def main() -> None:
-    with Application.start(name="Text toolbox") as app:
+    with Application.start(name="Clipboard tool") as app:
         build(app)
         app.run()
 

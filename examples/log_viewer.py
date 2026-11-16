@@ -1,141 +1,137 @@
-"""Live log viewer: a background thread streams records into a bounded, filterable view.
+"""Log viewer: follow a growing log file and highlight warnings and errors.
 
 What it teaches
-  * calling the SDK from your own thread (every Document method is thread-safe)
-  * one ``batch`` per flush: append many rows and trim the oldest in a single transaction
-  * ``trim_children`` keeps memory bounded; ``set_scroll_follow`` keeps the newest row in view
-  * filtering by toggling a CSS class instead of re-rendering
-  * stopping a worker cleanly on shutdown (``on_shutdown``) and escaping every log message
+  * polling without blocking the window: a background thread reads the new bytes of the file
+    every half second and appends complete lines (every SDK method is thread-safe)
+  * handling a file that is truncated or rotated, and partial last lines
+  * appending with ``insert_html`` and bounding the view with ``trim_children``
+  * keeping the view scrolled to the end with ``set_scroll_follow``
+  * escaping every log line, and stopping the thread cleanly on shutdown (``on_shutdown``)
 
-Run:  python examples/log_viewer.py
-The records come from a simulated service; replace ``simulated_records`` with a real source.
+Run:  python examples/log_viewer.py FILE        (for example /var/log/syslog or C:\\Logs\\app.log)
 """
 from __future__ import annotations
 
 import html
-import itertools
-import random
+import re
+import sys
 import threading
 import time
-from datetime import datetime
+from pathlib import Path
 
 from nativehtmlkit import Application, NativeHTMLKitError, Window
 
-MAX_ROWS = 500
+MAX_LINES = 500
+ERROR = re.compile(r"\b(ERROR|FATAL|FAIL(ED)?)\b")
+WARNING = re.compile(r"\bWARN(ING)?\b")
 
 PAGE = """<!doctype html>
-<html><head><meta charset="utf-8"><style>
-  body { margin:0; background:#0f141c; color:#d7dde8; font:13px sans-serif; display:flex; flex-direction:column; height:100vh; }
-  header { display:flex; gap:12px; align-items:center; padding:10px 14px; background:#18202c; border-bottom:1px solid #2a3443; }
-  header h1 { font-size:15px; margin:0 12px 0 0; }
-  select, button { background:#243044; color:#d7dde8; border:1px solid #3a4a62; border-radius:5px; padding:5px 9px; }
-  #count { margin-left:auto; color:#8a96a8; }
-  #log { flex:1; overflow:auto; font-family:monospace; padding:6px 0; }
-  .line { padding:1px 14px; white-space:pre-wrap; }
-  .line .time { color:#6c7a8e; } .line .lvl { display:inline-block; width:52px; font-weight:bold; }
-  .DEBUG .lvl { color:#7d8ba1; } .INFO .lvl { color:#6cb6ff; } .WARN .lvl { color:#f2c14e; } .ERROR .lvl { color:#ff6b6b; }
-  .ERROR { background:#2a1518; }
-  /* Filtering is pure CSS: the controller only switches a class on #log. */
-  #log.min-INFO .DEBUG, #log.min-WARN .DEBUG, #log.min-WARN .INFO,
-  #log.min-ERROR .DEBUG, #log.min-ERROR .INFO, #log.min-ERROR .WARN { display:none; }
+<html><head><style>
+  body { font-family: system-ui, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+  header { display: flex; gap: 12px; align-items: center; padding: 8px 12px; background: #eef1f6; }
+  #file { flex: 1; font-size: 13px; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #log { flex: 1; overflow: auto; margin: 0; padding: 8px 12px; list-style: none; font: 12px/1.45 monospace; }
+  #log li { white-space: pre-wrap; }
+  #log li.warn { background: #fff4ce; }
+  #log li.error { background: #fde7e9; color: #8a1c1c; }
+  footer { padding: 4px 12px; font-size: 12px; color: #555; }
 </style></head>
 <body>
-  <header>
-    <h1>Service log</h1>
-    <label>Level <select id="level">
-      <option value="DEBUG">Debug</option><option value="INFO" selected>Info</option>
-      <option value="WARN">Warning</option><option value="ERROR">Error</option></select></label>
-    <label><input id="pause" type="checkbox"> Pause</label>
-    <button id="clear">Clear</button>
-    <span id="count">0 records</span>
-  </header>
-  <div id="log" class="min-INFO"></div>
+  <header><span id="file"></span><label><input type="checkbox" id="paused"> Pause</label><button id="clear">Clear</button></header>
+  <ul id="log"></ul>
+  <footer id="status">Waiting for data...</footer>
 </body></html>"""
 
 
-def simulated_records():
-    """An endless stream of (level, message) pairs; messages may contain markup characters."""
-    users = ["alice", "bob", "<script>", "chloé"]
-    for n in itertools.count(1):
-        level = random.choices(["DEBUG", "INFO", "WARN", "ERROR"], [5, 10, 2, 1])[0]
-        yield level, f"request #{n} by {random.choice(users)} took {random.randint(3, 900)} ms"
+def read_new_text(path: Path, offset: int) -> tuple[int, str]:
+    """Return (new offset, complete new lines) from ``offset``; a partial last line is read again later."""
+    with path.open("rb") as handle:
+        size = handle.seek(0, 2)
+        if size < offset:            # the file was truncated or rotated
+            offset = 0
+        handle.seek(offset)
+        data = handle.read()
+    end = data.rfind(b"\n")
+    if end < 0:
+        return offset, ""
+    return offset + end + 1, data[:end + 1].decode("utf-8", errors="replace")
 
 
 class LogViewer:
-    def __init__(self, window: Window):
+    def __init__(self, window: Window, path: Path):
         self.document = doc = window.document
-        self.total = 0
-        self.paused = threading.Event()
+        self.path = path
+        self.offset = 0
+        self.line_count = 0
+        self.lock = threading.Lock()           # the poll thread and the Clear button both change the list
         self.stopped = threading.Event()
-        self._lock = threading.Lock()     # flushes come from the worker AND from callbacks
+        doc.set_text("file", str(path))
+        # Keep the list pinned to its end while new lines arrive (unless the user scrolls up).
         doc.command("set_scroll_follow", element="log", follow=True)
-        doc.on("change", self._on_level, element="level")
-        doc.on("change", lambda e: (self.paused.set() if e.get("checked") else self.paused.clear()), element="pause")
-        doc.on("click", lambda _e: self.clear(), element="clear")
+        doc.on("click", lambda _event: self.clear(), element="clear")
 
-    def append(self, records: list[tuple[str, str]]) -> None:
-        """Add rows and drop the oldest beyond MAX_ROWS, as ONE document transaction."""
-        if not records:
+    def add_lines(self, text: str) -> None:
+        rows = []
+        for line in re.split(r"\r?\n", text):
+            if not line:
+                continue
+            css = ' class="error"' if ERROR.search(line) else ' class="warn"' if WARNING.search(line) else ""
+            rows.append(f"<li{css}>{html.escape(line)}</li>")
+        if not rows:
             return
-        stamp = datetime.now().strftime("%H:%M:%S")
-        rows = "".join(
-            f'<div class="line {level}"><span class="time">{stamp}</span> '
-            f'<span class="lvl">{level}</span>{html.escape(message)}</div>'
-            for level, message in records)
-        with self._lock:
-            self.document.batch([
-                {"op": "insert_html", "element": "log", "position": "beforeend", "html": rows},
-                {"op": "trim_children", "element": "log", "keep": MAX_ROWS, "from": "start"},
-            ])
-            self.total += len(records)
-            self.document.set_text("count", f"{self.total} records")
+        with self.lock:
+            operations = [{"op": "insert_html", "element": "log", "position": "beforeend", "html": "".join(rows)}]
+            self.line_count += len(rows)
+            if self.line_count > MAX_LINES:
+                # Drop the oldest lines (from the start) and keep the newest.
+                operations.append({"op": "trim_children", "element": "log", "keep": MAX_LINES, "from": "start"})
+                self.line_count = MAX_LINES
+            self.document.batch(operations)
 
     def clear(self) -> None:
-        with self._lock:
+        with self.lock:
             self.document.replace_html("log", "")
-            self.total = 0
-            self.document.set_text("count", "0 records")
+            self.line_count = 0
 
-    def set_level(self, level: str) -> None:
-        for name in ("DEBUG", "INFO", "WARN", "ERROR"):
-            self.document.remove_class("log", f"min-{name}")
-        self.document.add_class("log", f"min-{level}")
+    def poll_once(self) -> float:
+        """Read and show new lines; return the delay before the next poll."""
+        try:
+            offset, text = read_new_text(self.path, self.offset)
+        except OSError as error:
+            self.document.set_text("status", f"Cannot read the file: {error.strerror or error} Retrying...")
+            return 2.0
+        if not self.document.get_checked("paused"):
+            self.add_lines(text)
+            self.offset = offset
+        self.document.set_text("status", f"{self.line_count} lines shown. Last check {time.strftime('%H:%M:%S')}.")
+        return 0.5
 
-    def _on_level(self, event: dict) -> None:
-        self.set_level(event.get("value") or "INFO")
-
-    def run_producer(self, source, *, interval: float = 0.25) -> threading.Thread:
-        """Collect records for ``interval`` seconds, then flush them in one batch."""
-        def worker() -> None:
-            pending: list[tuple[str, str]] = []
-            deadline = time.monotonic() + interval
-            for record in source:
-                if self.stopped.is_set():
+    def start(self) -> threading.Thread:
+        def loop() -> None:
+            delay = 0.0
+            while not self.stopped.wait(delay):
+                try:
+                    delay = self.poll_once()
+                except NativeHTMLKitError:      # window closed or application shutting down
                     return
-                if not self.paused.is_set():
-                    pending.append(record)
-                time.sleep(0.02)
-                if time.monotonic() >= deadline:
-                    try:
-                        self.append(pending)
-                    except NativeHTMLKitError:
-                        return  # window closed or application shutting down: stop quietly
-                    pending, deadline = [], time.monotonic() + interval
-        thread = threading.Thread(target=worker, name="log-producer", daemon=True)
+        thread = threading.Thread(target=loop, name="log-poll", daemon=True)
         thread.start()
         return thread
 
 
-def build(app: Application) -> LogViewer:
-    viewer = LogViewer(app.open_html(PAGE, title="Log viewer", width=820, height=560))
+def build(app: Application, path: Path) -> LogViewer:
+    path = path.resolve()
+    viewer = LogViewer(app.open_html(PAGE, title=f"Log - {path.name}", width=900, height=560), path)
     app.on_shutdown(viewer.stopped.set)
     return viewer
 
 
 def main() -> None:
-    with Application.start(name="Log viewer") as app:
-        viewer = build(app)
-        viewer.run_producer(simulated_records())
+    # Validate arguments before starting the host, so a usage error is a plain console error.
+    if len(sys.argv) != 2:
+        sys.exit("Pass the log file to follow: python log_viewer.py FILE")
+    with Application.start(name="Log tail") as app:
+        build(app, Path(sys.argv[1])).start()
         app.run()
 
 

@@ -50,11 +50,11 @@ Run `python hello.py` or `uv run hello.py`. `Application.start()` launches a sup
 | [signup_form.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/signup_form.py) | Native constraint validation, custom rules, `form_data` |
 | [window_manager.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/window_manager.py) | Several windows, window state, close vetoes |
 | [file_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/file_viewer.py) | Native Open / Save As / Choose Folder dialogs |
-| [settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py) | HTML `<dialog>`, popovers, dark mode |
+| [settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py) | HTML `<dialog>`, popovers, colour scheme, replaceable stylesheet |
 | [log_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/log_viewer.py) · [checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py) | Background threads, batched updates, cancel |
 | [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py) | Live RGBA bitmap rendered from Python |
 | [async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py) | asyncio tasks, async callbacks |
-| [text_toolbox.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/text_toolbox.py) | Clipboard, links, desktop preferences |
+| [text_toolbox.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/text_toolbox.py) | Clipboard tool: copy/paste, links, desktop preferences |
 | [data_table.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/data_table.py) · [dom_explorer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/dom_explorer.py) | Rendering data, nodes without ids |
 | [bulk_rename/](https://github.com/nativehtmlkit/nativehtmlkit-python/tree/main/examples/bulk_rename) | A multi-file app: preview, confirmation dialog, undo ([tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/bulk-rename.md)) |
 | [process_dashboard/](https://github.com/nativehtmlkit/nativehtmlkit-python/tree/main/examples/process_dashboard) | Background refresh, pause, clipboard ([tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/process-dashboard.md)) |

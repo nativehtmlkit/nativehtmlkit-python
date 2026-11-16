@@ -9,12 +9,13 @@ What it teaches
   * ``on_before_quit``: ask before quitting while a job is running
   * file names are untrusted text: escaped with ``html.escape``
 
-Run:  python examples/checksum.py
+Run:  python examples/checksum.py [FOLDER]      (default: the current directory)
 Type or browse to a folder, then press Start.
 """
 from __future__ import annotations
 
 import hashlib
+import sys
 import html
 import threading
 import time
@@ -153,13 +154,13 @@ class ChecksumApp:
 
 
 def build(app: Application) -> ChecksumApp:
-    return ChecksumApp(app, app.open_html(PAGE, title="Folder checksums", width=760, height=560))
+    return ChecksumApp(app, app.open_html(PAGE, title="Checksums", width=760, height=560))
 
 
 def main() -> None:
-    with Application.start(name="Folder checksums") as app:
+    with Application.start(name="Checksums") as app:
         checksum = build(app)
-        checksum.document.set_value("folder", str(Path.cwd()))
+        checksum.document.set_value("folder", sys.argv[1] if len(sys.argv) > 1 else str(Path.cwd()))
         app.run()
 
 

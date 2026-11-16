@@ -16,6 +16,8 @@ REQUIRED_KEYS = {"id", "title", "summary", "teaches", "file", "run", "language_s
 TUTORIAL_STEPS = ("tutorial/step1_window.py", "tutorial/step2_add.py", "tutorial/step3_complete_delete.py",
                   "tutorial/step4_edit_keyboard.py", "process_dashboard/step1_snapshot.py",
                   "process_dashboard/step2_filter.py")
+# Command-line arguments for programs that need them; "{log}" is a log file the test creates.
+START_ARGS = {"log_viewer.py": ["{log}"]}
 # Modules without a user interface, imported by examples.
 HELPERS = ("process_dashboard/processes.py",)
 

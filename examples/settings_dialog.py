@@ -1,142 +1,133 @@
-"""Settings dialog: an HTML <dialog> with a form, a help popover and saved preferences.
+"""Settings dialog: a settings dialog that applies and remembers preferences.
 
 What it teaches
-  * ``show_dialog`` / ``close_dialog`` with a return value, and the ``close`` event that reports it
-  * Escape (a native close request) and a Cancel button that both leave settings unchanged
-  * ``toggle_popover`` for lightweight help
-  * applying a colour scheme with ``set_environment`` so ``@media (prefers-color-scheme)`` rules switch
-  * saving settings to JSON and restoring them at start-up
+  * an HTML ``<dialog>`` opened modally with ``show_dialog`` and closed with a return value
+    (``close_dialog``)
+  * a popover help tip (``toggle_popover``)
+  * reading a form inside the dialog with ``form_data``; native validation (``min``/``max``/
+    ``required``) runs before the ``submit`` event is dispatched
+  * applying a colour scheme and reduced motion with ``set_environment``
+  * replacing one stylesheet in place (``add_stylesheet`` once, then ``replace_stylesheet``)
+  * saving settings as JSON
 
-Run:  python examples/settings_dialog.py
+Run:  python examples/settings_dialog.py [SETTINGS_FILE]
+Default settings file: <config folder>/NativeHTMLKit-Examples/settings.json
+(%APPDATA% on Windows, $XDG_CONFIG_HOME or ~/.config on Linux).
 """
 from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 from nativehtmlkit import Application, Window
 
-APP_ID = "org.nativehtmlkit.examples.settings"
-DEFAULTS = {"theme": "system", "font_size": "medium", "autosave": True, "display_name": ""}
-FONT_SIZES = {"small": "13px", "medium": "15px", "large": "18px"}
+DEFAULTS = {"theme": "system", "size": 15, "motion": False}
 
 PAGE = """<!doctype html>
-<html><head><meta charset="utf-8"><style>
-  :root { --bg:#f5f6fa; --card:#ffffff; --text:#1c2230; --muted:#6a7386; --accent:#3a63d8; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#12161f; --card:#1c2230; --text:#e6eaf3; --muted:#9aa3b6; --accent:#86a6ff; } }
-  body { margin:0; background:var(--bg); color:var(--text); font-family:sans-serif; }
-  main { max-width:620px; margin:30px auto; padding:0 20px; }
-  .card { background:var(--card); border-radius:10px; padding:18px 22px; }
-  button { padding:8px 14px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
-  button.secondary { background:transparent; color:var(--muted); border:1px solid var(--muted); }
-  dialog { border:0; border-radius:12px; padding:22px; width:380px; background:var(--card); color:var(--text); }
-  dialog label { display:block; margin:12px 0 4px; }
-  dialog input[type=text], dialog select { width:100%; box-sizing:border-box; padding:7px; }
-  .actions { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
-  #help { max-width:260px; padding:12px; border-radius:8px; border:1px solid var(--muted); background:var(--card); color:var(--text); }
-  #status { color:var(--muted); }
+<html><head><style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; margin: 24px; background: Canvas; color: CanvasText; }
+  @media (prefers-color-scheme: dark) { body { background: #1d222b; color: #e7ebf3; } }
+  dialog { padding: 20px 24px; border-radius: 10px; min-width: 320px; }
+  dialog label { display: block; margin: 10px 0 4px; }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  #help-tip { max-width: 260px; padding: 10px; font-size: 13px; }
+  #saved { color: #2e7d32; }
 </style></head>
-<body id="body"><main>
-  <h1 id="greeting">Hello</h1>
-  <div class="card">
-    <p>This window applies the saved preferences. Open the settings to change them.</p>
-    <button id="open-settings">Settings…</button> <button id="help-button" class="secondary">?</button>
-    <p id="status">Settings loaded.</p>
-  </div>
-  <div id="help" popover>Theme "System" follows the desktop. Settings are stored as JSON in the
-    application's data directory.</div>
-  <dialog id="settings">
-    <h2>Settings</h2>
+<body>
+  <h1>Report viewer</h1>
+  <p id="sample">This paragraph follows the chosen text size.</p>
+  <p><button id="open-settings">Settings...</button> <span id="saved" role="status"></span></p>
+
+  <dialog id="settings" aria-labelledby="settings-title">
+    <h2 id="settings-title">Settings</h2>
     <form id="settings-form">
-      <label for="display_name">Display name</label>
-      <input id="display_name" name="display_name" type="text" maxlength="40">
-      <label for="theme">Theme</label>
-      <select id="theme" name="theme"><option value="system">System</option>
-        <option value="light">Light</option><option value="dark">Dark</option></select>
-      <label for="font_size">Text size</label>
-      <select id="font_size" name="font_size"><option value="small">Small</option>
-        <option value="medium">Medium</option><option value="large">Large</option></select>
-      <label><input id="autosave" name="autosave" type="checkbox"> Save documents automatically</label>
-      <div class="actions">
-        <button id="cancel" type="button" class="secondary">Cancel</button>
-        <button id="save" type="submit">Save</button>
-      </div>
+      <label for="theme">Colour scheme <button type="button" id="help" aria-label="Help">?</button></label>
+      <select id="theme" name="theme"><option value="system">Follow the system</option><option value="light">Light</option><option value="dark">Dark</option></select>
+      <label for="size">Text size (px)</label>
+      <input id="size" name="size" type="number" min="11" max="24" required>
+      <label><input type="checkbox" id="motion" name="motion" value="reduce"> Reduce motion</label>
+      <div class="actions"><button type="button" id="cancel">Cancel</button><button type="submit" id="apply">Save</button></div>
     </form>
   </dialog>
-</main></body></html>"""
+  <div id="help-tip" popover>"Follow the system" uses the desktop colour preference when the host can observe it.</div>
+</body></html>"""
 
 
-def load_settings(path: Path) -> dict:
+def default_settings_path() -> Path:
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA") or Path.home() / "AppData" / "Roaming")
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+    return base / "NativeHTMLKit-Examples" / "settings.json"
+
+
+def read_settings(path: Path) -> dict:
+    """Saved values over the defaults; an unreadable file is ignored."""
+    settings = dict(DEFAULTS)
     try:
-        stored = json.loads(path.read_text(encoding="utf-8"))
+        saved = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        stored = {}
-    return {key: stored.get(key, default) for key, default in DEFAULTS.items()}
+        return settings
+    if isinstance(saved, dict):
+        settings.update({name: saved[name] for name in DEFAULTS if name in saved})
+    return settings
 
 
-class SettingsWindow:
-    def __init__(self, window: Window, store: Path):
+class SettingsDialog:
+    def __init__(self, window: Window, path: Path):
         self.document = doc = window.document
-        self.store = store
-        self.settings = load_settings(store)
-        self.outcome = "cancel"
-        self.apply()
-        doc.on("click", lambda _e: self.open(), element="open-settings")
-        doc.on("click", lambda _e: doc.toggle_popover("help"), element="help-button")
-        doc.on("click", lambda _e: doc.close_dialog("settings", "cancel"), element="cancel")
-        doc.on("submit", self._on_save, element="settings-form")
-        doc.on("close", self._on_close, element="settings")   # after any way of closing
+        self.path = path
+        self.settings = read_settings(path)
+        self.size_sheet = doc.add_stylesheet("")["sheet"]
+        doc.on("click", lambda _event: self.show(), element="open-settings")
+        doc.on("click", lambda _event: self.cancel(), element="cancel")
+        doc.on("click", lambda _event: doc.toggle_popover("help-tip"), element="help")
+        # Native validation (min/max/required) runs before this submit event is dispatched.
+        doc.on("submit", lambda _event: self.save(), element="settings-form")
+        self.apply(self.settings)
 
-    def open(self) -> None:
-        """Copy the current settings into the form, then show it as a modal dialog."""
+    def apply(self, settings: dict) -> None:
+        # "system" removes the app override so the observed desktop preference applies again.
+        self.document.set_environment(color_scheme=settings["theme"],
+                                      reduced_motion="reduce" if settings["motion"] else "system")
+        # Replace one app stylesheet in place instead of adding a new one each time.
+        self.document.replace_stylesheet(self.size_sheet, f"body {{ font-size: {int(settings['size'])}px; }}")
+
+    def show(self) -> None:
         doc, s = self.document, self.settings
-        doc.set_value("display_name", s["display_name"])        # set_value: plain text, no markup
-        doc.set_selected_values("theme", [s["theme"]])
-        doc.set_selected_values("font_size", [s["font_size"]])
-        doc.set_checked("autosave", bool(s["autosave"]))
-        self.outcome = "cancel"
-        doc.show_dialog("settings", modal=True)
-        doc.focus("display_name")
+        doc.set_selected_values("theme", [str(s["theme"])])
+        doc.set_value("size", str(s["size"]))
+        doc.set_checked("motion", bool(s["motion"]))
+        doc.show_dialog("settings")              # modal by default
 
-    def apply(self) -> None:
-        s, doc = self.settings, self.document
-        # "light"/"dark" override the desktop; "system" removes the override again.
-        doc.set_environment(color_scheme=s["theme"])
-        doc.set_attribute("body", "style", f"font-size:{FONT_SIZES[s['font_size']]}")
-        doc.set_text("greeting", f"Hello, {s['display_name']}" if s["display_name"] else "Hello")
+    def cancel(self) -> None:
+        self.document.close_dialog("settings", "cancelled")
+        self.document.set_text("saved", "Settings unchanged.")
 
-    def _on_save(self, _event: dict) -> None:
+    def save(self) -> None:
         entries = {e["name"]: e.get("value", "") for e in self.document.form_data("settings-form")["entries"]}
-        self.settings = {
-            "display_name": entries.get("display_name", "").strip(),
-            "theme": entries.get("theme", "system"),
-            "font_size": entries.get("font_size", "medium"),
-            "autosave": "autosave" in entries,       # unchecked boxes are absent from form data
-        }
-        self.store.parent.mkdir(parents=True, exist_ok=True)
-        temporary = self.store.with_name(self.store.name + ".tmp")
-        temporary.write_text(json.dumps(self.settings, indent=2), encoding="utf-8")
-        os.replace(temporary, self.store)
-        self.apply()
-        self.outcome = "saved"
+        self.settings = {"theme": entries.get("theme", "system"), "size": int(entries.get("size") or 15),
+                         "motion": "motion" in entries}       # unchecked boxes are absent from form data
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(json.dumps(self.settings, indent=2), encoding="utf-8")
+        self.apply(self.settings)
         self.document.close_dialog("settings", "saved")
-
-    def _on_close(self, event: dict) -> None:
-        # Fired for close_dialog() and for a native close request (Escape). event["return_value"]
-        # is the dialog's returnValue; as in HTML a close request does not reset it, so this
-        # controller tracks the outcome of the current opening itself.
-        self.document.set_text("status", "Settings saved." if self.outcome == "saved" else "No changes made.")
+        # Report here, not in the dialog's close event: a <dialog> keeps its previous return
+        # value when the user dismisses it with Escape, so "saved" would be reported again.
+        self.document.set_text("saved", f"Settings saved to {self.path}")
 
 
-def build(app: Application, store: Path) -> SettingsWindow:
-    return SettingsWindow(app.open_html(PAGE, title="Settings demo", width=680, height=520), store)
+def build(app: Application, path: Path) -> SettingsDialog:
+    return SettingsDialog(app.open_html(PAGE, title="Settings dialog", width=640, height=480), path)
 
 
 def main() -> None:
-    with Application.start(name="Settings demo", app_id=APP_ID) as app:
-        store = Path(app.rpc.call("desktop.paths")["config"]) / "settings.json"
-        build(app, store)
+    with Application.start(name="Settings dialog") as app:
+        path = Path(sys.argv[1]) if len(sys.argv) > 1 else default_settings_path()
+        build(app, path)
         app.run()
 
 

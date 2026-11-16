@@ -151,32 +151,48 @@ def signup_form(app):
 def log_viewer(app):
     import log_viewer as example
 
-    viewer = example.build(app)
+    log = _scratch() / "service.log"
+    log.write_text("INFO service started\nINFO listening on port 8080\n<script>not markup</script>\npartial", encoding="utf-8")
+    viewer = example.build(app, log)
     doc = viewer.document
     with Guard("log"):
-        viewer.append([("INFO", "started <b>service</b>"), ("ERROR", "disk & network down")])
-        check("log.rows_appended", _count(doc, "#log .line") == 2)
-        check("log.messages_escaped", _count(doc, "#log b") == 0 and "started <b>service</b>" in doc.get_text("log"))
-        viewer.append([("DEBUG", f"line {i}") for i in range(example.MAX_ROWS + 50)])
-        check("log.bounded_to_max_rows", _count(doc, "#log .line") == example.MAX_ROWS)
-        check("log.oldest_trimmed", "started" not in doc.get_text("log") and doc.get_text("count") == f"{example.MAX_ROWS + 52} records")
-        rows = doc.query_nodes("#log .DEBUG")["nodes"]
-        hidden = doc.computed_style(["display"], doc.node(reference=rows[0]["node"]))["properties"]["display"]["value"]
-        check("log.debug_hidden_at_info_level", hidden == "none", display=hidden)
-        viewer.set_level("DEBUG")
-        shown = doc.computed_style(["display"], doc.node(reference=rows[0]["node"]))["properties"]["display"]["value"]
-        check("log.debug_shown_at_debug_level", shown == "block", display=shown)
+        check("log.window_title", app.rpc.call("window.get", {"window_id": doc.window.id})["title"] == "Log - service.log")
+        check("log.file_shown", doc.get_text("file") == str(log.resolve()))
+        thread = viewer.start()
+        check("log.initial_lines", _wait(lambda: viewer.line_count == 3, 10), count=viewer.line_count)
+        check("log.partial_line_waits", "partial" not in doc.get_text("log"))
+        with log.open("a", encoding="utf-8") as handle:
+            handle.write(" line done\nWARN disk 91% full\nERROR backup job failed\n")
+        check("log.appended_lines", _wait(lambda: viewer.line_count == 6, 10), count=viewer.line_count)
+        check("log.partial_completed", "partial line done" in doc.get_text("log"))
+        check("log.error_highlighted", _count(doc, "#log li.error") == 1)
+        check("log.warning_highlighted", _count(doc, "#log li.warn") == 1)
+        third = doc.query_nodes("#log li")["nodes"][2]["node"]
+        markup = doc.command("get_html", node=third)["html"]
+        check("log.lines_escaped", markup == "&lt;script&gt;not markup&lt;/script&gt;", html=markup)
+        check("log.status", _wait(lambda: doc.get_text("status").startswith("6 lines shown. Last check ")))
+        doc.set_checked("paused", True)
+        time.sleep(0.6)
+        with log.open("a", encoding="utf-8") as handle:
+            handle.write("INFO while paused\n")
+        time.sleep(1.2)
+        check("log.pause_holds_lines", viewer.line_count == 6)
+        doc.set_checked("paused", False)
+        check("log.resume_catches_up", _wait(lambda: viewer.line_count == 7, 5))
+        viewer.add_lines("\n".join(f"DEBUG line {i}" for i in range(example.MAX_LINES + 20)))
+        check("log.bounded", _count(doc, "#log li") == example.MAX_LINES and viewer.line_count == example.MAX_LINES)
+        check("log.oldest_trimmed", "service started" not in doc.get_text("log"))
         viewer.clear()
-        thread = viewer.run_producer(example.simulated_records(), interval=0.1)
-        check("log.producer_thread_appends", _wait(lambda: _count(doc, "#log .line") > 0, 5))
-        viewer.paused.set()
-        time.sleep(0.3)
-        before = viewer.total
-        time.sleep(0.4)
-        check("log.pause_stops_appending", viewer.total == before, before=before, after=viewer.total)
+        check("log.clear", _count(doc, "#log li") == 0 and viewer.line_count == 0)
+        log.write_text("INFO rotated\n", encoding="utf-8")       # truncated: shorter than the offset
+        check("log.truncation_restarts", _wait(lambda: viewer.line_count == 1 and "rotated" in doc.get_text("log"), 5))
         viewer.stopped.set()
-        thread.join(2)
-        check("log.producer_stops", not thread.is_alive())
+        thread.join(3)
+        check("log.thread_stops", not thread.is_alive())
+        viewer.path = log.with_name("missing.log")
+        viewer.poll_once()
+        check("log.read_error_reported", doc.get_text("status").startswith("Cannot read the file: ")
+              and doc.get_text("status").endswith(" Retrying..."), text=doc.get_text("status"))
     quit_when_ready(app, delay=0.2)
 
 
@@ -187,36 +203,39 @@ def settings_dialog(app):
     store = _scratch() / "settings.json"
     settings = example.build(app, store)
     doc = settings.document
-
-    def background():
-        return doc.computed_style(["background-color"], "body")["properties"]["background-color"]["value"]
     with Guard("settings"):
-        light = background()
-        settings.open()
+        check("settings.defaults_applied", doc.computed_style(["font-size"], "sample")["properties"]["font-size"]["value"] == "15px")
+        settings.show()
         check("settings.dialog_open", doc.command("get_dialog", element="settings")["open"] is True)
-        doc.set_value("display_name", "Grace <admin>")
+        check("settings.form_prefilled", doc.get_value("size") == "15"
+              and [o["value"] for o in doc.options("theme") if o["selected"]] == ["system"])
         doc.set_selected_values("theme", ["dark"])
-        doc.set_selected_values("font_size", ["large"])
-        doc.set_checked("autosave", False)
-        doc.request_submit("settings-form", submitter="save")
-        check("settings.dialog_closed_after_save",
-              _wait(lambda: doc.command("get_dialog", element="settings")["open"] is False))
-        check("settings.return_value", doc.command("get_dialog", element="settings")["return_value"] == "saved")
-        check("settings.status_from_close_event", _wait(lambda: doc.get_text("status") == "Settings saved."))
-        check("settings.dark_scheme_applied", doc.environment()["color_scheme"] == "dark" and background() != light,
-              light=light, dark=background())
-        check("settings.greeting_plain_text", doc.get_text("greeting") == "Hello, Grace <admin>")
+        doc.set_value("size", "40")
+        result = doc.request_submit("settings-form", submitter="apply")
+        check("settings.max_blocks_submit", result.get("submitted") is False, result=result)
+        doc.set_value("size", "18")
+        doc.set_checked("motion", True)
+        result = doc.request_submit("settings-form", submitter="apply")
+        check("settings.valid_submit", result.get("submitted") is True, result=result)
+        check("settings.saved_reported", _wait(lambda: doc.get_text("saved") == f"Settings saved to {store}"))
+        environment = doc.environment()
+        check("settings.environment_applied", environment["color_scheme"] == "dark"
+              and environment["reduced_motion"] == "reduce", environment=environment)
+        size = doc.computed_style(["font-size"], "sample")["properties"]["font-size"]["value"]
+        check("settings.stylesheet_replaced", size == "18px" and len(doc.stylesheets()) == 2, size=size)
+        dialog = doc.command("get_dialog", element="settings")
+        check("settings.closed_with_return_value", dialog["open"] is False and dialog["return_value"] == "saved")
         saved = json.loads(store.read_text(encoding="utf-8"))
-        check("settings.saved_json", saved == {"display_name": "Grace <admin>", "theme": "dark",
-                                               "font_size": "large", "autosave": False}, saved=saved)
-        settings.open()
-        check("settings.form_prefilled", doc.get_value("display_name") == "Grace <admin>"
-              and [o["value"] for o in doc.options("theme") if o["selected"]] == ["dark"])
-        doc.close_dialog("settings", "cancel")
-        check("settings.cancel_reported", _wait(lambda: doc.get_text("status") == "No changes made."))
-        check("settings.help_popover_toggles", doc.toggle_popover("help") is True and doc.toggle_popover("help") is False)
-        again = example.load_settings(store)
-        check("settings.reload_from_disk", again["theme"] == "dark")
+        check("settings.saved_json", saved == {"theme": "dark", "size": 18, "motion": True}, saved=saved)
+        settings.show()
+        settings.cancel()
+        check("settings.cancel", doc.get_text("saved") == "Settings unchanged."
+              and doc.command("get_dialog", element="settings")["return_value"] == "cancelled")
+        check("settings.help_popover_toggles", doc.toggle_popover("help-tip") is True and doc.toggle_popover("help-tip") is False)
+        check("settings.reload_from_disk", example.read_settings(store) == saved)
+        store.write_text("{not json", encoding="utf-8")
+        check("settings.unreadable_file_ignored", example.read_settings(store) == example.DEFAULTS)
+        check("settings.default_path", example.default_settings_path().parts[-2:] == ("NativeHTMLKit-Examples", "settings.json"))
     quit_when_ready(app, delay=0.2)
 
 
@@ -324,6 +343,7 @@ def clipboard_tool(app):
     box = example.build(app)
     doc = box.document
     with Guard("toolbox"):
+        check("toolbox.window_title", app.rpc.call("window.get", {"window_id": box.window.id})["title"] == "Clipboard tool")
         doc.set_value("text", "b\na\nB\na")
         box.transform("sort")
         check("toolbox.sort_lines", doc.get_value("text") == "a\na\nb\nB")
@@ -402,6 +422,7 @@ def checksums(app):
         (folder / name).parent.mkdir(parents=True, exist_ok=True)
         (folder / name).write_bytes(data)
     with Guard("checksum"):
+        check("checksum.window_title", app.rpc.call("window.get", {"window_id": tool.window.id})["title"] == "Checksums")
         worker = tool.start(folder)
         check("checksum.worker_started", worker is not None)
         worker.join(30)

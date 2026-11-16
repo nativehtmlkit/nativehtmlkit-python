@@ -8,11 +8,12 @@ What it teaches
   * graceful degradation: without a desktop session (headless/CI) dialogs fail with RpcError -32001
   * showing file content safely with ``set_value`` (plain text) and escaping file names
 
-Run:  python examples/file_viewer.py
+Run:  python examples/file_viewer.py [FILE]
 """
 from __future__ import annotations
 
 import html
+import sys
 from concurrent.futures import Future
 from pathlib import Path
 
@@ -148,7 +149,9 @@ def build(app: Application) -> FileViewer:
 
 def main() -> None:
     with Application.start(name="File viewer") as app:
-        build(app)
+        viewer = build(app)
+        if len(sys.argv) > 1:              # optional: open a file at start, without a dialog
+            viewer.load(Path(sys.argv[1]))
         app.run()
 
 

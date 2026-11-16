@@ -37,7 +37,7 @@ language_specific = false
 [[example]]
 id = "signup-form"
 title = "Sign-up form"
-summary = "Account sign-up form with HTML validation, a custom rule and a result summary."
+summary = "Sign-up form with native constraint validation, a password-match rule, an error summary and a result."
 teaches = ["constraint validation", "invalid events", "set_custom_validity", "form_data", "reset_form"]
 file = "signup_form.py"
 run = "python signup_form.py"
@@ -67,20 +67,20 @@ language_specific = false
 [[example]]
 id = "log-viewer"
 title = "Log viewer"
-summary = "Live, filterable log stream fed by a background thread."
-teaches = ["batch", "trim_children", "CSS-class filtering", "worker threads"]
+summary = "Follows a growing log file with highlighting, pause, clear and auto-scroll."
+teaches = ["polling in a background thread", "appending lines", "trim_children", "set_scroll_follow"]
 file = "log_viewer.py"
-run = "python log_viewer.py"
+run = "python log_viewer.py FILE"
 guide = "background-work"
 language_specific = false
 
 [[example]]
 id = "file-viewer"
 title = "File viewer"
-summary = "Text viewer and editor with Open, Save As and a folder listing."
+summary = "Text file viewer and editor with native Open, Save As and Choose Folder dialogs."
 teaches = ["open_files/save_file/choose_folder", "wait=False futures", "file filters", "-32001 fallback"]
 file = "file_viewer.py"
-run = "python file_viewer.py"
+run = "python file_viewer.py [FILE]"
 guide = "file-dialogs"
 language_specific = false
 
@@ -97,17 +97,17 @@ language_specific = false
 [[example]]
 id = "settings-dialog"
 title = "Settings dialog"
-summary = "Settings in a modal HTML dialog, saved to JSON, with a dark-mode switch."
-teaches = ["show_dialog/close_dialog", "close event", "popovers", "set_environment"]
+summary = "Settings in a modal HTML dialog, saved to JSON: colour scheme, text size and reduced motion."
+teaches = ["show_dialog/close_dialog", "popovers", "set_environment", "replaceable stylesheet", "form validation"]
 file = "settings_dialog.py"
-run = "python settings_dialog.py"
+run = "python settings_dialog.py [SETTINGS_FILE]"
 guide = "dialogs-and-popovers"
 language_specific = false
 
 [[example]]
 id = "clipboard-tool"
 title = "Clipboard tool"
-summary = "Text transforms with copy and paste, links and desktop preferences."
+summary = "Text transforms, copy and paste, a documentation link and the desktop colour scheme."
 teaches = ["clipboard", "link_activated", "open_external", "capabilities"]
 file = "text_toolbox.py"
 run = "python text_toolbox.py"
@@ -117,10 +117,10 @@ language_specific = false
 [[example]]
 id = "checksums"
 title = "Checksums"
-summary = "SHA-256 of every file in a folder, computed in a worker thread with cancel."
+summary = "SHA-256 of every file in a folder, computed in the background with progress, cancel and a quit warning."
 teaches = ["worker thread", "throttled progress", "cooperative cancel", "on_before_quit"]
 file = "checksum.py"
-run = "python checksum.py"
+run = "python checksum.py [FOLDER]"
 guide = "background-work"
 language_specific = false
 

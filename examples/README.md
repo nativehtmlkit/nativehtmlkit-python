@@ -23,7 +23,7 @@ python examples/todo.py
 
 | Example | What it is | What it teaches |
 |---|---|---|
-| [signup_form.py](signup_form.py) | **Sign-up form**: Account sign-up form with HTML validation, a custom rule and a result summary. | constraint validation, invalid events, set_custom_validity, form_data, reset_form |
+| [signup_form.py](signup_form.py) | **Sign-up form**: Sign-up form with native constraint validation, a password-match rule, an error summary and a result. | constraint validation, invalid events, set_custom_validity, form_data, reset_form |
 | [data_table.py](data_table.py) | **Inventory data table**: Searchable, sortable, paged table rendered from data, with a details pane. | input/change events, batch updates, rendering rows safely |
 | [process_viewer.py](process_viewer.py) | **Process viewer**: Sortable, filterable table of running processes. | rendering data as a table, input event value, sortable headers with aria-sort |
 | [dom_explorer.py](dom_explorer.py) | **DOM explorer**: Tree view of a live DOM with selecting, editing, moving and deleting nodes. | Node, query_nodes, children, inspect, move_to, stale nodes |
@@ -33,8 +33,8 @@ python examples/todo.py
 | Example | What it is | What it teaches |
 |---|---|---|
 | [window_manager.py](window_manager.py) | **Multiple windows**: Note windows managed from a main window, with a close veto for unsaved notes. | several windows, window state, on_window_event, on_before_close |
-| [settings_dialog.py](settings_dialog.py) | **Settings dialog**: Settings in a modal HTML dialog, saved to JSON, with a dark-mode switch. | show_dialog/close_dialog, close event, popovers, set_environment |
-| [file_viewer.py](file_viewer.py) | **File viewer**: Text viewer and editor with Open, Save As and a folder listing. | open_files/save_file/choose_folder, wait=False futures, file filters, -32001 fallback |
+| [settings_dialog.py](settings_dialog.py) | **Settings dialog**: Settings in a modal HTML dialog, saved to JSON: colour scheme, text size and reduced motion. | show_dialog/close_dialog, popovers, set_environment, replaceable stylesheet, form validation |
+| [file_viewer.py](file_viewer.py) | **File viewer**: Text file viewer and editor with native Open, Save As and Choose Folder dialogs. | open_files/save_file/choose_folder, wait=False futures, file filters, -32001 fallback |
 | [bulk_rename/app.py](bulk_rename/app.py) | **Bulk rename**: Rename many files with find/replace, a live preview, a confirmation dialog and undo. | open_file with index.html and style.css, pure planning logic, live preview, folder dialog fallback, undo |
 
 ## Keyboard, desktop services and diagnostics
@@ -42,15 +42,15 @@ python examples/todo.py
 | Example | What it is | What it teaches |
 |---|---|---|
 | [keyboard_shortcuts.py](keyboard_shortcuts.py) | **Snippet editor**: A snippet editor with keyboard shortcuts, Tab indentation and a help popover. | keydown chords, prevent_default, replace_control_range, control selection |
-| [text_toolbox.py](text_toolbox.py) | **Clipboard tool**: Text transforms with copy and paste, links and desktop preferences. | clipboard, link_activated, open_external, capabilities |
+| [text_toolbox.py](text_toolbox.py) | **Clipboard tool**: Text transforms, copy and paste, a documentation link and the desktop colour scheme. | clipboard, link_activated, open_external, capabilities |
 | [diagnostics.py](diagnostics.py) | **About and support**: An About/Support window: capabilities, preferences, counters and a support bundle. | capabilities, desktop_preferences, host_diagnostics, export_support_bundle |
 
 ## Background work and live updates
 
 | Example | What it is | What it teaches |
 |---|---|---|
-| [log_viewer.py](log_viewer.py) | **Log viewer**: Live, filterable log stream fed by a background thread. | batch, trim_children, CSS-class filtering, worker threads |
-| [checksum.py](checksum.py) | **Checksums**: SHA-256 of every file in a folder, computed in a worker thread with cancel. | worker thread, throttled progress, cooperative cancel, on_before_quit |
+| [log_viewer.py](log_viewer.py) | **Log viewer**: Follows a growing log file with highlighting, pause, clear and auto-scroll. | polling in a background thread, appending lines, trim_children, set_scroll_follow |
+| [checksum.py](checksum.py) | **Checksums**: SHA-256 of every file in a folder, computed in the background with progress, cancel and a quit warning. | worker thread, throttled progress, cooperative cancel, on_before_quit |
 | [async_jobs.py](async_jobs.py) | **Background jobs**: Concurrent jobs with progress bars and cancel buttons. | asyncio tasks, async callbacks, AsyncRpcClient, cancellation |
 | [live_chart.py](live_chart.py) | **Live chart**: A 30 fps scrolling line chart drawn into a live bitmap. | create_bitmap, RGBA frames, try_present from a producer thread |
 | [process_dashboard/dashboard.py](process_dashboard/dashboard.py) | **Process dashboard**: Live process monitor that refreshes in the background, with filter, sort, pause and copy. | background thread, thread-safe updates, pause/resume, clipboard |
@@ -120,14 +120,12 @@ exercised on a real desktop.
 ## Screenshots
 
 Real captures on KDE Plasma 6.6 Wayland (100% scaling) with Core 1.0.3, Python SDK 0.1.2, taken by
-running each example unchanged. Windows looks the same apart from the window frame.
+running each example unchanged. Examples without a picture here changed after the last capture. Windows looks the same apart from the window frame.
 
 | | |
 |---|---|
 | [async_counter](async_counter.py)<br>![async_counter](../docs/images/examples/py-sdk-async_counter.png) | [async_jobs](async_jobs.py)<br>![async_jobs](../docs/images/examples/py-sdk-async_jobs.png) |
-| [checksum](checksum.py)<br>![checksum](../docs/images/examples/py-sdk-checksum.png) | [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) |
-| [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) | [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) |
-| [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) | [live_chart](live_chart.py)<br>![live_chart](../docs/images/examples/py-sdk-live_chart.png) |
-| [log_viewer](log_viewer.py)<br>![log_viewer](../docs/images/examples/py-sdk-log_viewer.png) | [settings_dialog](settings_dialog.py)<br>![settings_dialog](../docs/images/examples/py-sdk-settings_dialog.png) |
-| [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) | [text_toolbox](text_toolbox.py)<br>![text_toolbox](../docs/images/examples/py-sdk-text_toolbox.png) |
+| [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) | [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) |
+| [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) | [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) |
+| [live_chart](live_chart.py)<br>![live_chart](../docs/images/examples/py-sdk-live_chart.png) | [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) |
 | [todo](todo.py)<br>![todo](../docs/images/examples/py-sdk-todo.png) | [window_manager](window_manager.py)<br>![window_manager](../docs/images/examples/py-sdk-window_manager.png) |

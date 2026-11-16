@@ -48,7 +48,14 @@ document.on("close", lambda e: document.set_text("status", "Dialog closed"), ele
 ```
 
 Fill the form before `show_dialog` with `set_value`, `set_checked` and `set_selected_values`, and
-move focus with `document.focus(...)`. ([settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py))
+move focus with `document.focus(...)`. Native validation (`required`, `min`, `max`) runs before
+`submit`, so an out-of-range value keeps the dialog open.
+
+Report the outcome from the button and submit handlers rather than from `close`: after Escape the
+dialog still carries the return value of its previous closing.
+[settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py)
+does this: **Save** writes the JSON file, applies the settings and calls
+`close_dialog("settings", "saved")`; **Cancel** calls `close_dialog("settings", "cancelled")`.
 
 ## Popovers
 

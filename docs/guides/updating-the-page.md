@@ -16,8 +16,9 @@ document.remove_class("row-4", "selected")
 Read back with `get_text`, `get_value`, `get_checked`, and for attributes
 `document.command("get_attribute", element="bar", name="style")["value"]`.
 
-Prefer toggling **classes** and letting CSS do the work. The log viewer filters by level with a
-single class on the container instead of re-rendering rows:
+Prefer toggling **classes** and letting CSS do the work. For example, to filter a log by level,
+give each row its level as a class and switch one class on the container instead of re-rendering
+rows:
 
 ```css
 #log.min-WARN .DEBUG, #log.min-WARN .INFO { display: none; }

@@ -37,7 +37,7 @@ def test_catalog_entries_are_complete_and_unique():
         missing = example_catalog.REQUIRED_KEYS - entry.keys()
         assert not missing, (entry.get("id"), missing)
         assert (_ROOT / entry["file"]).is_file(), entry["file"]
-        assert entry["run"].endswith(entry["file"]), entry
+        assert f"python {entry['file']}" in entry["run"], entry
 
 
 def test_every_program_is_catalogued():
@@ -62,7 +62,10 @@ def test_example_reaches_ready_and_stops(tmp_path, example):
     if not DESKTOP:
         env["NATIVEHTMLKIT_TEST_MODE"] = "1"
     options = {"start_new_session": True} if os.name == "posix" else {"creationflags": 0x00000200}
-    proc = subprocess.Popen([sys.executable, str(example)], cwd=tmp_path, env=env, stdout=subprocess.PIPE,
+    log = tmp_path / "example.log"
+    log.write_text("INFO started\n", encoding="utf-8")
+    args = [a.replace("{log}", str(log)) for a in example_catalog.START_ARGS.get(example.relative_to(_ROOT).as_posix(), [])]
+    proc = subprocess.Popen([sys.executable, str(example), *args], cwd=tmp_path, env=env, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, **options)
     ready, deadline = False, time.monotonic() + 30
     while not ready and time.monotonic() < deadline and proc.poll() is None:
