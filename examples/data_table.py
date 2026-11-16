@@ -7,7 +7,7 @@ What it teaches
   * a details pane updated with ``set_text`` (always plain text)
   * splitting state (Python) from presentation (HTML/CSS)
 
-Run:  python examples/data_table.py
+Run:  uv run data_table.py
 """
 from __future__ import annotations
 

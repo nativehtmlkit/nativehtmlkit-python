@@ -7,7 +7,7 @@ What it teaches
   * ``asyncio.to_thread`` for synchronous SDK calls (never block the loop)
   * ``await adapter.run()`` waits for shutdown; remaining tasks are cancelled afterwards
 
-Run:  python examples/async_jobs.py      (or: python -m nativehtmlkit run async_jobs:amain)
+Run:  uv run async_jobs.py      (or: uv run -m nativehtmlkit run async_jobs:amain)
 """
 from __future__ import annotations
 

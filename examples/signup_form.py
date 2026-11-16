@@ -7,7 +7,7 @@ What it teaches
   * reading the submitted values with ``form_data`` (ordered entries, repeated names kept)
   * showing an error summary and a result with escaped user text
 
-Run:  python examples/signup_form.py
+Run:  uv run signup_form.py
 """
 from __future__ import annotations
 

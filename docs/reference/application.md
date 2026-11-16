@@ -27,7 +27,7 @@ Application.start(*, name=None, app_id=None, version=None, icon=None, instance="
                   startup_timeout_ms=30_000, shutdown_timeout_ms=5_000, max_windows=16) -> Application
 ```
 
-The normal entry point for `python app.py`, `uv run app.py` and `python -m package.app`.
+The normal entry point for `uv run app.py` and `uv run -m package.app`.
 
 The call has **two roles**:
 
@@ -90,7 +90,7 @@ Connect to the host that launched **this** process. The host passes `UI4ME_ENDPO
 `host.hello`, requires protocol v1 and removes those four variables from `os.environ` (also when
 it fails), so child processes never inherit the credential. Use it in a backend started from your
 own manifest (`nativehtmlkit-python-host run --app app.toml`); `Application.start()` and
-`python -m nativehtmlkit run` call it for you.
+`uv run -m nativehtmlkit run` call it for you.
 
 Raises `StartupError` when the endpoint or token variable is missing, `ProtocolError` for a token
 that is not 64 hexadecimal characters or a host that did not negotiate protocol v1, `RpcError` if

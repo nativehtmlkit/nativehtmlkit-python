@@ -10,7 +10,7 @@ title = "Hello"
 summary = "The smallest complete app: a greeting form that writes untrusted text safely."
 teaches = ["application lifecycle", "get_value", "set_text"]
 file = "hello.py"
-run = "python hello.py"
+run = "uv run hello.py"
 guide = "lifecycle"
 language_specific = false
 
@@ -20,7 +20,7 @@ title = "Counter"
 summary = "A counter with a step selector, limits and a bounded change history."
 teaches = ["shared state", "event delegation", "batch updates", "trim_children"]
 file = "counter.py"
-run = "python counter.py"
+run = "uv run counter.py"
 guide = "updating-the-page"
 language_specific = false
 
@@ -30,7 +30,7 @@ title = "Todo list"
 summary = "Add, edit, complete, filter and delete tasks, saved to a JSON file."
 teaches = ["form submit", "delegated list events", "escaping user text", "keyboard editing", "atomic JSON persistence"]
 file = "todo.py"
-run = "python todo.py"
+run = "uv run todo.py"
 guide = "events-and-callbacks"
 language_specific = false
 
@@ -40,7 +40,7 @@ title = "Sign-up form"
 summary = "Sign-up form with native constraint validation, a password-match rule, an error summary and a result."
 teaches = ["constraint validation", "invalid events", "set_custom_validity", "form_data", "reset_form"]
 file = "signup_form.py"
-run = "python signup_form.py"
+run = "uv run signup_form.py"
 guide = "forms-and-validation"
 language_specific = false
 
@@ -50,7 +50,7 @@ title = "Inventory data table"
 summary = "Searchable, sortable, paged table rendered from data, with a details pane."
 teaches = ["input/change events", "batch updates", "rendering rows safely"]
 file = "data_table.py"
-run = "python data_table.py"
+run = "uv run data_table.py"
 guide = "updating-the-page"
 language_specific = false
 
@@ -60,7 +60,7 @@ title = "Process viewer"
 summary = "Sortable, filterable table of running processes."
 teaches = ["rendering data as a table", "input event value", "sortable headers with aria-sort"]
 file = "process_viewer.py"
-run = "python process_viewer.py"
+run = "uv run process_viewer.py"
 guide = "updating-the-page"
 language_specific = false
 
@@ -70,7 +70,7 @@ title = "Log viewer"
 summary = "Follows a growing log file with highlighting, pause, clear and auto-scroll."
 teaches = ["polling in a background thread", "appending lines", "trim_children", "set_scroll_follow"]
 file = "log_viewer.py"
-run = "python log_viewer.py FILE"
+run = "uv run log_viewer.py FILE"
 guide = "background-work"
 language_specific = false
 
@@ -80,7 +80,7 @@ title = "File viewer"
 summary = "Text file viewer and editor with native Open, Save As and Choose Folder dialogs."
 teaches = ["open_files/save_file/choose_folder", "wait=False futures", "file filters", "-32001 fallback"]
 file = "file_viewer.py"
-run = "python file_viewer.py [FILE]"
+run = "uv run file_viewer.py [FILE]"
 guide = "file-dialogs"
 language_specific = false
 
@@ -90,7 +90,7 @@ title = "Multiple windows"
 summary = "Note windows managed from a main window, with a close veto for unsaved notes."
 teaches = ["several windows", "window state", "on_window_event", "on_before_close"]
 file = "window_manager.py"
-run = "python window_manager.py"
+run = "uv run window_manager.py"
 guide = "windows"
 language_specific = false
 
@@ -100,7 +100,7 @@ title = "Settings dialog"
 summary = "Settings in a modal HTML dialog, saved to JSON: colour scheme, text size and reduced motion."
 teaches = ["show_dialog/close_dialog", "popovers", "set_environment", "replaceable stylesheet", "form validation"]
 file = "settings_dialog.py"
-run = "python settings_dialog.py [SETTINGS_FILE]"
+run = "uv run settings_dialog.py [SETTINGS_FILE]"
 guide = "dialogs-and-popovers"
 language_specific = false
 
@@ -110,7 +110,7 @@ title = "Clipboard tool"
 summary = "Text transforms, copy and paste, a documentation link and the desktop colour scheme."
 teaches = ["clipboard", "link_activated", "open_external", "capabilities"]
 file = "text_toolbox.py"
-run = "python text_toolbox.py"
+run = "uv run text_toolbox.py"
 guide = "clipboard-and-desktop"
 language_specific = false
 
@@ -120,7 +120,7 @@ title = "Checksums"
 summary = "SHA-256 of every file in a folder, computed in the background with progress, cancel and a quit warning."
 teaches = ["worker thread", "throttled progress", "cooperative cancel", "on_before_quit"]
 file = "checksum.py"
-run = "python checksum.py [FOLDER]"
+run = "uv run checksum.py [FOLDER]"
 guide = "background-work"
 language_specific = false
 
@@ -130,7 +130,7 @@ title = "Live chart"
 summary = "A live line chart of memory use drawn into an RGBA bitmap."
 teaches = ["create_bitmap", "RGBA frames", "present from a background thread", "pause"]
 file = "live_chart.py"
-run = "python live_chart.py"
+run = "uv run live_chart.py"
 guide = "live-bitmaps"
 language_specific = false
 
@@ -140,7 +140,7 @@ title = "Snippet editor"
 summary = "A snippet editor with keyboard shortcuts, Tab indentation and a help popover."
 teaches = ["keydown chords", "prevent_default", "replace_control_range", "control selection"]
 file = "keyboard_shortcuts.py"
-run = "python keyboard_shortcuts.py"
+run = "uv run keyboard_shortcuts.py"
 guide = "keyboard-and-focus"
 language_specific = false
 
@@ -150,7 +150,7 @@ title = "About and support"
 summary = "An About/Support window: capabilities, preferences, counters and a support bundle."
 teaches = ["capabilities", "desktop_preferences", "host_diagnostics", "export_support_bundle"]
 file = "diagnostics.py"
-run = "python diagnostics.py"
+run = "uv run diagnostics.py"
 guide = "diagnostics-and-troubleshooting"
 language_specific = false
 
@@ -160,7 +160,7 @@ title = "DOM explorer"
 summary = "Tree view of a live DOM with selecting, editing, moving and deleting nodes."
 teaches = ["Node", "query_nodes", "children", "inspect", "move_to", "stale nodes"]
 file = "dom_explorer.py"
-run = "python dom_explorer.py"
+run = "uv run dom_explorer.py"
 guide = "updating-the-page"
 language_specific = false
 
@@ -170,7 +170,7 @@ title = "Focus timer"
 summary = "A countdown timer that asks before quitting while it runs."
 teaches = ["both entry styles", "on_before_quit", "on_shutdown", "request_attention"]
 file = "focus_timer.py"
-run = "python focus_timer.py"
+run = "uv run focus_timer.py"
 guide = "lifecycle"
 language_specific = false
 
@@ -180,7 +180,7 @@ title = "Background jobs"
 summary = "Concurrent jobs with progress bars and cancel buttons."
 teaches = ["asyncio tasks", "async callbacks", "AsyncRpcClient", "cancellation"]
 file = "async_jobs.py"
-run = "python async_jobs.py"
+run = "uv run async_jobs.py"
 guide = "background-work"
 language_specific = false
 
@@ -190,7 +190,7 @@ title = "Bulk rename"
 summary = "Rename many files with find/replace, a live preview, a confirmation dialog and undo."
 teaches = ["open_file with index.html and style.css", "pure planning logic", "live preview", "folder dialog fallback", "undo"]
 file = "bulk_rename/app.py"
-run = "python bulk_rename/app.py"
+run = "uv run bulk_rename/app.py"
 guide = "project-scaffolding"
 language_specific = false
 
@@ -200,7 +200,7 @@ title = "Process dashboard"
 summary = "Live process monitor that refreshes in the background, with filter, sort, pause and copy."
 teaches = ["background thread", "thread-safe updates", "pause/resume", "clipboard"]
 file = "process_dashboard/dashboard.py"
-run = "python process_dashboard/dashboard.py"
+run = "uv run process_dashboard/dashboard.py"
 guide = "background-work"
 language_specific = false
 
@@ -210,6 +210,6 @@ title = "Async counter"
 summary = "A counter whose callback is an async function (asyncio basics)."
 teaches = ["async_adapter", "awaitable document.command"]
 file = "async_counter.py"
-run = "python async_counter.py"
+run = "uv run async_counter.py"
 guide = "asyncio"
 language_specific = true

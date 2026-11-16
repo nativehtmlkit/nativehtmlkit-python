@@ -9,7 +9,7 @@ What it teaches
 The process list uses only the standard library: ``/proc`` on Linux and the Win32 API (through
 ``ctypes``) on Windows. In your own code, ``psutil`` is a good alternative.
 
-Run:  python examples/process_viewer.py
+Run:  uv run process_viewer.py
 """
 from __future__ import annotations
 

@@ -2,8 +2,8 @@
 
 What it teaches
   * a ``setup(app)`` entry point that works with BOTH launch styles:
-      python examples/focus_timer.py                         (Application.start)
-      cd examples && python -m nativehtmlkit run focus_timer:setup   (host-first runner)
+      uv run focus_timer.py                         (Application.start)
+      uv run -m nativehtmlkit run focus_timer:setup   (host-first runner)
   * ``on_before_quit``: veto a quit while the timer runs and ask with an HTML <dialog>
   * ``on_shutdown``: save statistics after the host shut down (no more RPC is possible then)
   * ``Window.request_attention`` (where the platform supports it) and ``Window.set(title=...)``
@@ -160,7 +160,7 @@ def build(app: Application, stats_file: Path) -> FocusTimer:
 
 
 def setup(app: Application) -> None:
-    """Entry point for ``python -m nativehtmlkit run focus_timer:setup``; the runner calls app.run()."""
+    """Entry point for ``uv run -m nativehtmlkit run focus_timer:setup``; the runner calls app.run()."""
     stats = Path(app.rpc.call("desktop.paths")["state"]) / "focus-timer.json"
     build(app, stats)
 

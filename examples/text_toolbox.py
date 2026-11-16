@@ -8,7 +8,7 @@ What it teaches
   * one delegated click handler for a toolbar of buttons
   * ``get_value`` / ``set_value`` and the UTF-16 based ``control_selection`` offsets
 
-Run:  python examples/text_toolbox.py
+Run:  uv run text_toolbox.py
 """
 from __future__ import annotations
 

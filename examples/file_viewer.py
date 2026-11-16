@@ -8,7 +8,7 @@ What it teaches
   * graceful degradation: without a desktop session (headless/CI) dialogs fail with RpcError -32001
   * showing file content safely with ``set_value`` (plain text) and escaping file names
 
-Run:  python examples/file_viewer.py [FILE]
+Run:  uv run file_viewer.py [FILE]
 """
 from __future__ import annotations
 

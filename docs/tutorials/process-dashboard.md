@@ -4,8 +4,8 @@ You will build **Process Dashboard**: a native window with a table of running pr
 refreshes itself in the background, can be filtered and sorted, paused, and copied to the
 clipboard. It works the same on Linux and Windows.
 
-**Time:** about 30 minutes. **You need:** Python 3.10+ on Linux x64 (glibc 2.39+) or Windows x64,
-`python -m pip install nativehtmlkit`, and the first window from
+**Time:** about 30 minutes. **You need:** [uv](https://docs.astral.sh/uv/getting-started/installation/) on Linux x64 (glibc 2.39+) or Windows x64,
+a project with the SDK (`uv init --app dashboard && cd dashboard && uv add nativehtmlkit`), and the first window from
 [getting started](../getting-started.md).
 
 The code is in
@@ -150,7 +150,7 @@ What it teaches
   * building HTML rows from data with ``html.escape``
   * filling the page before ``app.run()`` announces readiness, so the window opens complete
 
-Run:    python examples/process_dashboard/step1_snapshot.py
+Run:    uv run process_dashboard/step1_snapshot.py
 Guide:  docs/tutorials/process-dashboard.md (step 1 of 3)
 """
 from __future__ import annotations
@@ -204,7 +204,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Run `python step1_snapshot.py`.
+Run `uv run step1_snapshot.py`.
 
 - The page is a Python string. Every element the code changes has an `id`: here only the table
   body `rows`.
@@ -226,7 +226,7 @@ What it teaches
   * reading controls with ``get_value``
   * ``set_text`` for text that must never be parsed as HTML
 
-Run:    python examples/process_dashboard/step2_filter.py
+Run:    uv run process_dashboard/step2_filter.py
 Guide:  docs/tutorials/process-dashboard.md (step 2 of 3)
 """
 from __future__ import annotations
@@ -334,7 +334,7 @@ What it teaches
   * copying the table to the clipboard with ``set_clipboard_text`` (and a fallback without one)
   * stopping the thread from ``app.on_shutdown``
 
-Run:    python examples/process_dashboard/dashboard.py [--refresh-seconds 3]
+Run:    uv run process_dashboard/dashboard.py [--refresh-seconds 3]
 Guide:  docs/tutorials/process-dashboard.md (step 3 of 3)
 """
 from __future__ import annotations
@@ -506,7 +506,7 @@ if __name__ == "__main__":
   (for example `StaleDocumentError`); the loop ends quietly.
 - **Copy table** uses `app.set_clipboard_text` inside `try`/`except RpcError`: some sessions (for
   example headless test runs) have no clipboard and report error -32001.
-- `--refresh-seconds` is a normal command-line option: `python dashboard.py --refresh-seconds 10`.
+- `--refresh-seconds` is a normal command-line option: `uv run dashboard.py --refresh-seconds 10`.
   The arguments are parsed in `main()`; the host re-runs the script with the same arguments.
 
 ## Test it without a screen
@@ -527,7 +527,7 @@ thread.join(5)
 See `process_dashboard` in
 [tests/integration/example_checks.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/tests/integration/example_checks.py)
 for the complete version, and run a check of your own with
-`NATIVEHTMLKIT_TEST_MODE=1 python -m nativehtmlkit run module:function` as shown in
+`NATIVEHTMLKIT_TEST_MODE=1 uv run -m nativehtmlkit run module:function` as shown in
 [project scaffolding](../guides/project-scaffolding.md#test-it-headless).
 
 ## What you learned

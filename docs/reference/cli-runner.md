@@ -1,7 +1,9 @@
 # Command-line tools
 
-Installing `nativehtmlkit` adds four commands. `python -m nativehtmlkit` is the same as
-`nativehtmlkit-python`.
+Installing `nativehtmlkit` adds four commands. In a uv project, start them with `uv run` (for
+example `uv run nativehtmlkit-python version`). `uv run -m nativehtmlkit` is the same as
+`nativehtmlkit-python`. `nativehtmlkit-new` also works before you have a project:
+`uvx --from nativehtmlkit nativehtmlkit-new DIRECTORY`.
 
 | Command | Purpose |
 |---|---|
@@ -46,19 +48,19 @@ example an unhandled exception in `CALLABLE`, or a lost backend connection), 128
 
 ```bash
 cd examples
-python -m nativehtmlkit run focus_timer:setup --name "Focus timer"
-python -m nativehtmlkit run async_jobs:amain
+uv run -m nativehtmlkit run focus_timer:setup --name "Focus timer"
+uv run -m nativehtmlkit run async_jobs:amain
 ```
 
 ### `doctor`
 
-`nativehtmlkit-python doctor` runs the host's own environment report (JSON: host version, build
+`uv run nativehtmlkit-python doctor` runs the host's own environment report (JSON: host version, build
 identity, OS, desktop session variables, per-app paths, renderer, containment). It does not open
 windows. Times out after 15 s.
 
 ### `version`
 
-`nativehtmlkit-python version` prints JSON: `sdk_version`, `client_version`, `protocol_version`,
+`uv run nativehtmlkit-python version` prints JSON: `sdk_version`, `client_version`, `protocol_version`,
 `python` and `host` (`source`: `bundled`/`environment`/`path`, `path`, `sha256`, the bundled
 `manifest`, `manifest_match`, the host's `source_identity` and `source_identity_match`). It starts
 no application. Exit status 1 when no host is found or the bundled host does not match its pinned
@@ -117,13 +119,15 @@ nativehtmlkit-new DIRECTORY [--name NAME] [--python INTERPRETER]
 
 Create a project in a new or empty directory: `app.py` (an `Application.start()` app with a
 form handler), `index.html`, `style.css`, `pyproject.toml` (depends on `nativehtmlkit>=0.1.1`) and
-an optional `app.toml` manifest that pins `--python` (default: the current interpreter). The app id
+an optional `app.toml` manifest that pins `--python` (default: the current interpreter; under `uvx`
+that is a temporary interpreter in uv's cache, so point `program` at your project's `.venv`
+interpreter before using the manifest). The app id
 is `org.nativehtmlkit.examples.<slug>`; change it for your own application. Refuses to overwrite a
 non-empty directory (exit status 2). Then:
 
 ```bash
 cd DIRECTORY
-python app.py
+uv run app.py
 ```
 
 ## `nativehtmlkit-skill`

@@ -1,6 +1,6 @@
 """Tutorial step 1: open a native window with HTML and CSS.
 
-Run:  python examples/tutorial/step1_window.py
+Run:  uv run tutorial/step1_window.py
 See docs/tutorials/todo-app.md for the explanation.
 """
 from nativehtmlkit import Application

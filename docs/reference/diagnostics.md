@@ -10,7 +10,7 @@ from nativehtmlkit import diagnostics_session_id, export_support_bundle
 
 ## Levels
 
-Set with `NATIVEHTMLKIT_DIAGNOSTICS` (or `nativehtmlkit-python --diagnostics LEVEL ...`):
+Set with `NATIVEHTMLKIT_DIAGNOSTICS` (or `uv run nativehtmlkit-python --diagnostics LEVEL ...`):
 
 | Level | Recorded | Written to disk |
 |---|---|---|
@@ -82,8 +82,8 @@ RPC payloads, form values, credentials, environment variables, raw host output, 
 From the command line (uses the most recently recorded session unless `--session` is given):
 
 ```bash
-NATIVEHTMLKIT_DIAGNOSTICS=trace python app.py          # reproduce the problem
-nativehtmlkit-python support bundle.zip                # then export it
+NATIVEHTMLKIT_DIAGNOSTICS=trace uv run app.py          # reproduce the problem
+uv run nativehtmlkit-python support bundle.zip                # then export it
 ```
 
 ## Host counters

@@ -37,7 +37,7 @@ def test_catalog_entries_are_complete_and_unique():
         missing = example_catalog.REQUIRED_KEYS - entry.keys()
         assert not missing, (entry.get("id"), missing)
         assert (_ROOT / entry["file"]).is_file(), entry["file"]
-        assert f"python {entry['file']}" in entry["run"], entry
+        assert f"uv run {entry['file']}" in entry["run"], entry
 
 
 def test_every_program_is_catalogued():

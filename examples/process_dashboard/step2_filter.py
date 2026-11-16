@@ -5,7 +5,7 @@ What it teaches
   * reading controls with ``get_value``
   * ``set_text`` for text that must never be parsed as HTML
 
-Run:    python examples/process_dashboard/step2_filter.py
+Run:    uv run process_dashboard/step2_filter.py
 Guide:  docs/tutorials/process-dashboard.md (step 2 of 3)
 """
 from __future__ import annotations

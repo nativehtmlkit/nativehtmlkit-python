@@ -87,7 +87,7 @@ application failure); quit with `request_quit` for an orderly end.
 
 ## The host-first runner
 
-`python -m nativehtmlkit run app:amain` calls `amain(app)`, runs the returned coroutine with
+`uv run -m nativehtmlkit run app:amain` calls `amain(app)`, runs the returned coroutine with
 `asyncio.run` and then calls `app.run()`. Because `amain` awaited `adapter.run()`, that final
 call returns at once.
 

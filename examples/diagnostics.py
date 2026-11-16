@@ -9,8 +9,8 @@ What it teaches
   * ``Document.diagnostics()`` (CSS/resource notes for one document)
   * ``export_support_bundle`` (a local, redacted ZIP; nothing is uploaded)
 
-Run:  python examples/diagnostics.py [OUTPUT_FOLDER]      (default: the temporary folder)
-Tip:  set NATIVEHTMLKIT_DIAGNOSTICS=trace (or run ``nativehtmlkit-python --diagnostics trace ...``)
+Run:  uv run diagnostics.py [OUTPUT_FOLDER]      (default: the temporary folder)
+Tip:  set NATIVEHTMLKIT_DIAGNOSTICS=trace (or run ``uv run nativehtmlkit-python --diagnostics trace ...``)
       to record callback and request timing in the bundle.
 """
 from __future__ import annotations

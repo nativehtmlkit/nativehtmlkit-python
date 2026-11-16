@@ -5,7 +5,7 @@ What it teaches
   * building HTML rows from data with ``html.escape``
   * filling the page before ``app.run()`` announces readiness, so the window opens complete
 
-Run:    python examples/process_dashboard/step1_snapshot.py
+Run:    uv run process_dashboard/step1_snapshot.py
 Guide:  docs/tutorials/process-dashboard.md (step 1 of 3)
 """
 from __future__ import annotations

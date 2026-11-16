@@ -14,15 +14,14 @@ The finished app is
 `app.py`, `index.html` and `style.css`. Every `app.py` excerpt below is copied from that file,
 which the repository's test suite runs against the real native host.
 
-**You need** Python 3.10+ on Linux x64 (glibc 2.39+) or Windows x64, a desktop session, and the
-package: `python -m pip install nativehtmlkit`.
+**You need** [uv](https://docs.astral.sh/uv/getting-started/installation/) on Linux x64 (glibc 2.39+) or Windows x64, and a desktop session.
 
 ## Step 1: create the project
 
 ```bash
-nativehtmlkit-new BulkRename --name "Bulk rename"
+uvx --from nativehtmlkit nativehtmlkit-new BulkRename --name "Bulk rename"
 cd BulkRename
-python app.py
+uv run app.py               # installs nativehtmlkit into the project on first run
 ```
 
 A window with a name field and an **Add item** button opens. Close it. You now have `app.py`,
@@ -85,7 +84,7 @@ if __name__ == "__main__":
 ```
 
 Run it: the window shows the empty tool. The launcher passes your command-line arguments to the
-backend run, so `python app.py ~/Pictures` will reach `build()` as `folder` in step 5.
+backend run, so `uv run app.py ~/Pictures` will reach `build()` as `folder` in step 5.
 
 `build(app, ...)` returns the object that owns the window. `main()` uses it, and so will the test
 in step 9.
@@ -290,7 +289,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Run `python app.py <a folder with some files>`. Type `IMG_` in **Find** and `photo-` in
+Run `uv run app.py <a folder with some files>`. Type `IMG_` in **Find** and `photo-` in
 **Replace with**: the preview updates while you type, and the summary counts the files that would
 be renamed.
 
@@ -433,7 +432,7 @@ def check(application):
 ```
 
 ```bash
-NATIVEHTMLKIT_TEST_MODE=1 python -m nativehtmlkit run check_rename:check    # prints: check passed
+NATIVEHTMLKIT_TEST_MODE=1 uv run -m nativehtmlkit run check_rename:check    # prints: check passed
 ```
 
 `set_value` and `set_checked` do not fire `input`/`change` events, so the test calls

@@ -9,7 +9,7 @@ What it teaches
   * ``on_before_quit``: ask before quitting while a job is running
   * file names are untrusted text: escaped with ``html.escape``
 
-Run:  python examples/checksum.py [FOLDER]      (default: the current directory)
+Run:  uv run checksum.py [FOLDER]      (default: the current directory)
 Type or browse to a folder, then press Start.
 """
 from __future__ import annotations

@@ -3,21 +3,21 @@
 ## First checks
 
 ```bash
-nativehtmlkit-python version      # SDK, protocol and host provenance (exit 1 if the host is missing/mismatched)
-nativehtmlkit-python doctor       # the host's own environment report
+uv run nativehtmlkit-python version      # SDK, protocol and host provenance (exit 1 if the host is missing/mismatched)
+uv run nativehtmlkit-python doctor       # the host's own environment report
 ```
 
 ## Turn on tracing
 
 ```bash
-NATIVEHTMLKIT_DIAGNOSTICS=trace python app.py
-# or: nativehtmlkit-python --diagnostics trace run app:setup
+NATIVEHTMLKIT_DIAGNOSTICS=trace uv run app.py
+# or: uv run nativehtmlkit-python --diagnostics trace run app:setup
 ```
 
 Records go to `~/.local/state/nativehtmlkit/diagnostics/` (Linux) or
 `%LOCALAPPDATA%\NativeHTMLKit\diagnostics\` (Windows), or `NATIVEHTMLKIT_DIAGNOSTICS_DIR`. They
 contain names, ids, counts and timings, never your data. Export one session as a ZIP for a bug
-report with `nativehtmlkit-python support bundle.zip`. Details: [diagnostics reference](../reference/diagnostics.md).
+report with `uv run nativehtmlkit-python support bundle.zip`. Details: [diagnostics reference](../reference/diagnostics.md).
 
 ## Symptoms
 

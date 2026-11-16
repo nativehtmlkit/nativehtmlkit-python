@@ -1,6 +1,6 @@
 """Tutorial step 3: complete and delete items with one delegated handler.
 
-Run:  python examples/tutorial/step3_complete_delete.py
+Run:  uv run tutorial/step3_complete_delete.py
 """
 import html
 

@@ -8,8 +8,8 @@ other, which threads run your code, and why handles become stale. For the API it
 
 ```mermaid
 flowchart LR
-  L["Launcher<br/>python app.py<br/>(Application.start)"] -- "starts, relays output,<br/>exits with its status" --> H["Native host<br/>nativehtmlkit-host run --app"]
-  H -- "starts and supervises" --> B["Backend<br/>python app.py (again)<br/>Application returned here"]
+  L["Launcher<br/>uv run app.py: python app.py<br/>(Application.start)"] -- "starts, relays output,<br/>exits with its status" --> H["Native host<br/>nativehtmlkit-host run --app"]
+  H -- "starts and supervises" --> B["Backend<br/>python app.py (again, same interpreter)<br/>Application returned here"]
   B <-- "authenticated local socket / named pipe<br/>length-prefixed JSON-RPC (wire v1)" --> H
 ```
 
@@ -39,7 +39,7 @@ and receives events.
    connects with [`from_environment()`](reference/application.md#applicationfrom_environment-classmethod)
    and returns the `Application`.
 
-Consequently code before `start()` runs in both processes. `python -m nativehtmlkit run
+Consequently code before `start()` runs in both processes. `uv run -m nativehtmlkit run
 module:func` avoids that: its launcher never imports your module, and its backend imports it once,
 after connecting.
 
@@ -49,7 +49,7 @@ after connecting.
 override), else the wheel's bundled `_bin/nativehtmlkit-host[.exe]`, whose SHA-256 must match
 `_bin/HOST-MANIFEST.json` on **every** launch (`HostVerificationError` otherwise), else, only with
 `NATIVEHTMLKIT_ALLOW_PATH_HOST=1`, an absolute `PATH` entry (unverified, with a warning).
-`nativehtmlkit-python version` reports which one is used and whether the build identity matches.
+`uv run nativehtmlkit-python version` reports which one is used and whether the build identity matches.
 
 ### Lifetime binding
 

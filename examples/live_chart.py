@@ -9,7 +9,7 @@ What it teaches
 
 The chart shows this Python process's working set (resident memory), sampled twice per second.
 
-Run:  python examples/live_chart.py
+Run:  uv run live_chart.py
 """
 from __future__ import annotations
 

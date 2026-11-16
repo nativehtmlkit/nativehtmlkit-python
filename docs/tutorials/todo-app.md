@@ -8,16 +8,17 @@ Every step is a complete program in [`examples/tutorial/`](https://github.com/na
 result is [`examples/todo.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/todo.py). All of them are started and checked by this
 repository's test suite against the real native host.
 
-**You need** Python 3.10+ on Linux x64 (glibc 2.39+) or Windows x64, and about 30 minutes.
+**You need** [uv](https://docs.astral.sh/uv/getting-started/installation/) on Linux x64 (glibc 2.39+) or Windows x64, and about 30 minutes.
 
 ```bash
-python -m pip install nativehtmlkit      # or: uv add nativehtmlkit
-nativehtmlkit-python version             # prints the SDK and bundled host versions
+uv init --app todo && cd todo
+uv add nativehtmlkit
+uv run nativehtmlkit-python version             # prints the SDK and bundled host versions
 ```
 
 ## Step 1: a window with HTML and CSS
 
-Create `todo.py`:
+Create `todo.py` in the project folder:
 
 ```python
 from nativehtmlkit import Application
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Run it with `python todo.py`. A native window appears; the HTML and CSS are rendered by the Rust
+Run it with `uv run todo.py`. A native window appears; the HTML and CSS are rendered by the Rust
 host. There is no browser and no JavaScript.
 
 What happened:
@@ -280,7 +281,7 @@ body { background:var(--bg); color:var(--text); }
 Run the finished app:
 
 ```bash
-python examples/todo.py
+uv run todo.py
 ```
 
 ## Test it without a desktop
@@ -289,7 +290,7 @@ The host has a headless mode for automated tests. It runs the whole protocol wit
 windows (and without user input):
 
 ```bash
-NATIVEHTMLKIT_TEST_MODE=1 python examples/todo.py      # PowerShell: $env:NATIVEHTMLKIT_TEST_MODE=1
+NATIVEHTMLKIT_TEST_MODE=1 uv run todo.py      # PowerShell: $env:NATIVEHTMLKIT_TEST_MODE=1
 ```
 
 Combine it with `request_submit`, `set_value` and read-back methods to test behaviour in CI.

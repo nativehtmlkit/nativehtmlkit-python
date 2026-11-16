@@ -1,6 +1,6 @@
 """Tutorial step 2: add items with a form and keep user text safe.
 
-Run:  python examples/tutorial/step2_add.py
+Run:  uv run tutorial/step2_add.py
 """
 import html
 

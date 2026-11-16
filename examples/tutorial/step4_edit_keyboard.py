@@ -1,6 +1,6 @@
 """Tutorial step 4: edit in place, keyboard handling and a small controller class.
 
-Run:  python examples/tutorial/step4_edit_keyboard.py
+Run:  uv run tutorial/step4_edit_keyboard.py
 Step 5 (persistence and styling) is examples/todo.py.
 """
 from __future__ import annotations

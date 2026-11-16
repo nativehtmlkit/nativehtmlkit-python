@@ -17,8 +17,8 @@ The catalogue ids are the parity keys shared with the PowerShell SDK's examples 
 Two ways to start an example:
 
 ```bash
-python examples/focus_timer.py                              # Application.start()
-cd examples && python -m nativehtmlkit run focus_timer:setup   # host-first runner, setup(app)
+uv run focus_timer.py                              # Application.start()
+uv run -m nativehtmlkit run focus_timer:setup   # host-first runner, setup(app)
 ```
 
 The public showcase repository has a guided gallery covering several features in one window:

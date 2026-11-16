@@ -12,7 +12,7 @@ What it teaches
 Shortcuts: Tab indent, Ctrl+S save, Ctrl+L insert timestamp, Ctrl+Shift+U upper-case the
 selection, F1 show/hide help, Escape hide help.
 
-Run:  python examples/keyboard_shortcuts.py [FILE]
+Run:  uv run keyboard_shortcuts.py [FILE]
 Default file: ~/Documents/nativehtmlkit-snippet.txt (or ~/nativehtmlkit-snippet.txt without a Documents folder).
 """
 from __future__ import annotations

@@ -9,7 +9,7 @@ What it teaches
 
 This is the finished app of the tutorial in docs/tutorials/todo-app.md.
 
-Run:  python examples/todo.py      (or: uv run examples/todo.py)
+Run:  uv run todo.py
 Data: <per-user data directory>/todos.json (printed at start-up).
 """
 from __future__ import annotations

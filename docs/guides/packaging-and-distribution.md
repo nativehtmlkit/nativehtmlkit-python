@@ -33,11 +33,12 @@ dependencies = ["nativehtmlkit==0.1.2"]
 myapp = "myapp.app:main"
 ```
 
-Users install with `pip install myapp` or `uv tool install myapp`, and start `myapp` (or
-`python -m myapp` with a `myapp/__main__.py` that calls `main()`). `Application.start()` re-runs the
-same command as the backend. Both forms were checked on Linux; on Windows, `python -m myapp` uses
-the same mechanism as `python app.py`, while generated `.exe` script launchers were not part of the
-0.1.2 checks, so try yours before relying on it.
+Users install with `uv tool install myapp` and start `myapp`; during development, `uv run -m myapp`
+(with a `myapp/__main__.py` that calls `main()`) or `uv run myapp` work in the project.
+`Application.start()` re-runs the same Python command as the backend. On Linux this was checked
+for installed script launchers and `-m`; on Windows, `-m` uses the same mechanism as
+`uv run app.py`, while generated `.exe` script launchers were not part of the 0.1.2 checks, so try
+yours before relying on it.
 
 Platform support follows the `nativehtmlkit` wheels: Linux x64 (glibc 2.39+) and Windows x64,
 Python 3.10+. The source distribution of `nativehtmlkit` has no host.

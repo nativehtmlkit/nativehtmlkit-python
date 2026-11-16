@@ -9,7 +9,7 @@ What it teaches
   * copying the table to the clipboard with ``set_clipboard_text`` (and a fallback without one)
   * stopping the thread from ``app.on_shutdown``
 
-Run:    python examples/process_dashboard/dashboard.py [--refresh-seconds 3]
+Run:    uv run process_dashboard/dashboard.py [--refresh-seconds 3]
 Guide:  docs/tutorials/process-dashboard.md (step 3 of 3)
 """
 from __future__ import annotations

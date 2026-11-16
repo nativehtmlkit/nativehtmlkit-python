@@ -11,12 +11,12 @@
 ## Install
 
 ```bash
-python -m pip install nativehtmlkit
-# or: uv add nativehtmlkit
-nativehtmlkit-python version
+uv init --app myapp && cd myapp      # a project for your app (https://docs.astral.sh/uv/)
+uv add nativehtmlkit
+uv run nativehtmlkit-python version
 ```
 
-Published wheels target Windows x64 and Linux x64 (the currently released Linux wheel specifies **glibc 2.39+**). Check platform compatibility before assuming a pip install will work. The source distribution does **not** bundle the native host; use a compatible published wheel for normal use. Python 3.10+.
+Published wheels target Windows x64 and Linux x64 (the currently released Linux wheel specifies **glibc 2.39+**). Check platform compatibility before assuming the install will work. The source distribution does **not** bundle the native host; use a compatible published wheel for normal use. Python 3.10+.
 
 ## Your first app
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     main()
 ```
 
-Run `python hello.py` or `uv run hello.py`. `Application.start()` launches a supervised host and re-executes the backend: keep side effects inside `main()`. Alternatively `python -m nativehtmlkit run module:setup` imports your module once and calls `setup(app)` ([lifecycle](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/lifecycle.md)).
+Run `uv run hello.py`. `Application.start()` launches a supervised host and re-executes the backend: keep side effects inside `main()`. Alternatively `uv run -m nativehtmlkit run module:setup` imports your module once and calls `setup(app)` ([lifecycle](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/lifecycle.md)).
 
 `set_text` and `set_value` treat input as plain text; `replace_html` and `insert_html` parse trusted markup, so escape user data with `html.escape` ([security](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/security.md)). For automated tests, `NATIVEHTMLKIT_TEST_MODE=1` runs the real host headless.
 

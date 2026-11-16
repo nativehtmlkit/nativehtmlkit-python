@@ -4,15 +4,15 @@
 
 | Entry point | Use it when | Your code |
 |---|---|---|
-| `Application.start()` in a script | Normal applications: `python app.py`, `uv run app.py`, `python -m pkg.app` | `with Application.start(...) as app: ...; app.run()` |
-| `python -m nativehtmlkit run module:func` | Module-level code must run once; quick experiments | `def func(app): ...` (the runner calls `app.run()`) |
+| `Application.start()` in a script | Normal applications: `uv run app.py`, `uv run -m pkg.app` | `with Application.start(...) as app: ...; app.run()` |
+| `uv run -m nativehtmlkit run module:func` | Module-level code must run once; quick experiments | `def func(app): ...` (the runner calls `app.run()`) |
 | `Application.from_environment()` with a manifest | You ship your own `app.toml` (pinned interpreter, fixed app id) and launch it with `nativehtmlkit-python-host run --app app.toml` | `Application.from_environment()`, or `Application.start()`, which only connects in that case |
 
 ### `Application.start()` and the second run
 
 The native host must own the windows and supervise the Python process. When you run
-`python app.py`, `Application.start()` starts the host, and the host runs **the same command
-again** as its backend. In that second run `start()` connects and returns the `Application`. The
+`uv run app.py`, `Application.start()` starts the host, and the host runs **the same Python command
+again** (the interpreter uv started, with the same script and arguments) as its backend. In that second run `start()` connects and returns the `Application`. The
 first process waits, relays output, and exits with the host's status.
 
 So code *before* `start()` runs twice, and code after it runs once (in the backend):
@@ -37,10 +37,10 @@ if __name__ == "__main__":
 (`StartupError`), because the host could not run it again. Arguments (`sys.argv`) and the working
 directory are passed to the second run unchanged.
 
-### `python -m nativehtmlkit run`
+### `uv run -m nativehtmlkit run`
 
 ```bash
-python -m nativehtmlkit run notes:setup --name "Notes"
+uv run -m nativehtmlkit run notes:setup --name "Notes"
 ```
 
 The launcher process never imports your module; only the backend does, once. `setup(app)` creates
@@ -50,10 +50,10 @@ entry point is awaited first. See the [command reference](../reference/cli-runne
 A module can support both styles:
 
 ```python
-def setup(app):                       # python -m nativehtmlkit run focus_timer:setup
+def setup(app):                       # uv run -m nativehtmlkit run focus_timer:setup
     build(app)
 
-def main():                           # python focus_timer.py
+def main():                           # uv run focus_timer.py
     with Application.start(name="Focus timer") as app:
         setup(app)
         app.run()

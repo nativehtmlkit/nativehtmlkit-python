@@ -9,7 +9,7 @@ What it teaches
   * the native folder picker with a capability check and an ``RpcError`` fallback
   * a confirmation ``<dialog>``, per-file error handling, and undo
 
-Run:  python examples/bulk_rename/app.py [FOLDER]
+Run:  uv run bulk_rename/app.py [FOLDER]
 In regular-expression mode the replacement uses Python syntax: ``\\1`` or ``\\g<1>`` for groups.
 """
 from __future__ import annotations

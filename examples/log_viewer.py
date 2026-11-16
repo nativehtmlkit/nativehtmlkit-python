@@ -8,7 +8,7 @@ What it teaches
   * keeping the view scrolled to the end with ``set_scroll_follow``
   * escaping every log line, and stopping the thread cleanly on shutdown (``on_shutdown``)
 
-Run:  python examples/log_viewer.py FILE        (for example /var/log/syslog or C:\\Logs\\app.log)
+Run:  uv run log_viewer.py FILE        (for example /var/log/syslog or C:\\Logs\\app.log)
 """
 from __future__ import annotations
 
@@ -129,7 +129,7 @@ def build(app: Application, path: Path) -> LogViewer:
 def main() -> None:
     # Validate arguments before starting the host, so a usage error is a plain console error.
     if len(sys.argv) != 2:
-        sys.exit("Pass the log file to follow: python log_viewer.py FILE")
+        sys.exit("Pass the log file to follow: uv run log_viewer.py FILE")
     with Application.start(name="Log tail") as app:
         build(app, Path(sys.argv[1])).start()
         app.run()

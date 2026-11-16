@@ -10,11 +10,14 @@ this shape:
 ## Generate a project
 
 ```bash
-python -m pip install nativehtmlkit
-nativehtmlkit-new InventoryTool --name "Inventory tool"
+uvx --from nativehtmlkit nativehtmlkit-new InventoryTool --name "Inventory tool"
 cd InventoryTool
-python app.py                      # or: uv run app.py
+uv run app.py                      # creates .venv and installs nativehtmlkit on first run
 ```
+
+`uvx` runs the generator without installing anything; the generated `pyproject.toml` makes the
+folder a uv project. The generator's own closing message still says `python app.py`; use
+`uv run app.py`.
 
 A window with a name field and an **Add item** button opens. The command prints the files it
 created and refuses to write into a directory that is not empty (exit status 2). Options:
@@ -23,7 +26,7 @@ created and refuses to write into a directory that is not empty (exit status 2).
 |---|---|
 | `DIRECTORY` | New or empty project directory. |
 | `--name NAME` | Display name; defaults to the directory name. It also forms the application id. |
-| `--python INTERPRETER` | Interpreter written into the optional `app.toml` (default: the one running the command). |
+| `--python INTERPRETER` | Interpreter written into the optional `app.toml` (default: the one running the command; under `uvx` a temporary one in uv's cache, so set `program` in `app.toml` to `.venv`'s interpreter if you use the manifest). |
 
 The folder contains:
 
@@ -41,7 +44,7 @@ to your own reverse-DNS name before you ship.
 
 ## How the generated app starts
 
-`python app.py` starts the native host, and the host runs `app.py` a second time as its backend
+`uv run app.py` starts the native host, and the host runs `app.py` a second time as its backend
 (see [lifecycle](lifecycle.md)). That is why the generated code keeps all work inside `main()`:
 
 ```python
@@ -135,7 +138,7 @@ def check(application):
 ```
 
 ```bash
-NATIVEHTMLKIT_TEST_MODE=1 python -m nativehtmlkit run check_app:check     # prints: check passed
+NATIVEHTMLKIT_TEST_MODE=1 uv run -m nativehtmlkit run check_app:check     # prints: check passed
 ```
 
 A failed `assert` ends the run with exit status 1 and the traceback. Headless mode has no pointer

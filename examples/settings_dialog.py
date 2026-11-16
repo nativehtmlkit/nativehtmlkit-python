@@ -10,7 +10,7 @@ What it teaches
   * replacing one stylesheet in place (``add_stylesheet`` once, then ``replace_stylesheet``)
   * saving settings as JSON
 
-Run:  python examples/settings_dialog.py [SETTINGS_FILE]
+Run:  uv run settings_dialog.py [SETTINGS_FILE]
 Default settings file: <config folder>/NativeHTMLKit-Examples/settings.json
 (%APPDATA% on Windows, $XDG_CONFIG_HOME or ~/.config on Linux).
 """

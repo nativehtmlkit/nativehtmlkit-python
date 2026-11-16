@@ -8,7 +8,7 @@ What it teaches
   * atomic multi-element updates with ``Document.batch`` (one host transaction)
   * a bounded list: ``insert_html`` at the top plus ``trim_children``
 
-Run:  python examples/counter.py
+Run:  uv run counter.py
 """
 from __future__ import annotations
 

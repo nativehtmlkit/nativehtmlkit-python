@@ -6,10 +6,18 @@ it teaches and how to run it; all of them use only the public SDK API and run on
 [PowerShell SDK examples](https://github.com/nativehtmlkit/nativehtmlkit-powershell/tree/main/examples),
 which use the same ids for their counterparts.
 
+Run them from a uv project that has the SDK. Copy an example file (or its folder, for
+`bulk_rename/` and `process_dashboard/`) into the project and run it:
+
 ```bash
-python -m pip install nativehtmlkit
-python examples/todo.py
+uv init --app nhk-examples && cd nhk-examples
+uv add nativehtmlkit
+cp ../nativehtmlkit-python/examples/todo.py .     # from a clone of this repository
+uv run todo.py
 ```
+
+Running `uv run examples/todo.py` inside a clone of this repository does **not** work: uv would
+build the SDK from this source tree, which has no native host.
 
 ## Start here
 
@@ -82,8 +90,8 @@ python examples/todo.py
 ## Two ways to start an example
 
 ```bash
-python examples/focus_timer.py                                  # Application.start()
-cd examples && python -m nativehtmlkit run focus_timer:setup    # host-first runner, setup(app)
+uv run focus_timer.py                                  # Application.start()
+uv run -m nativehtmlkit run focus_timer:setup    # host-first runner, setup(app)
 ```
 
 ## Without a desktop

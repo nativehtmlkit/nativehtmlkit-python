@@ -6,7 +6,7 @@ What it teaches
   * reading an input value with ``get_value``
   * writing untrusted text safely with ``set_text`` (it never parses HTML)
 
-Run:  python examples/hello.py      (or: uv run examples/hello.py)
+Run:  uv run hello.py
 """
 from __future__ import annotations
 

@@ -13,21 +13,22 @@ talk over a private local connection.
 
 ## Install
 
-You need CPython 3.10 to 3.14 on **Linux x64** (glibc 2.39 or newer) or **Windows x64**, and a
-desktop session to see windows.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) on **Linux x64** (glibc 2.39 or newer) or **Windows x64**, and a desktop
+session to see windows. uv provides a CPython 3.10 to 3.14 for the project if you have none.
 
 ```bash
-python -m pip install nativehtmlkit         # or: uv add nativehtmlkit
-nativehtmlkit-python version                # prints the SDK, protocol and bundled host versions
+uv init --app hello && cd hello         # a project for your app
+uv add nativehtmlkit
+uv run nativehtmlkit-python version     # prints the SDK, protocol and bundled host versions
 ```
 
 The platform wheels bundle the native host and check its SHA-256 on every start. The source
-distribution has no host; use a published wheel. `nativehtmlkit-python doctor` prints the host's
+distribution has no host; use a published wheel. `uv run nativehtmlkit-python doctor` prints the host's
 view of your desktop session (display server, paths, renderer) without opening a window.
 
 ## Your first window
 
-Save this as `hello.py`. It is the repository's
+Save this as `hello.py` in the project folder. It is the repository's
 [hello.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/hello.py)
 example:
 
@@ -77,7 +78,7 @@ if __name__ == "__main__":
 Run it:
 
 ```bash
-python hello.py          # or: uv run hello.py
+uv run hello.py
 ```
 
 A window titled **Hello** opens. Type a name and press **Greet**. Close the window to end the
@@ -101,7 +102,7 @@ Every element your Python code touches has an `id`. That is how you address the 
 
 ## Other ways to run
 
-- `python -m nativehtmlkit run hello:build` imports `hello.py` only in the backend and calls
+- `uv run -m nativehtmlkit run hello:build` imports `hello.py` only in the backend and calls
   `build(app)`; the runner then calls `app.run()` for you. Use it when module-level code must run
   only once (see [lifecycle](guides/lifecycle.md)).
 - `nativehtmlkit-new myapp --name "My App"` creates a project with `app.py`, `index.html` and
@@ -131,15 +132,15 @@ def check(app):
 ```
 
 ```bash
-NATIVEHTMLKIT_TEST_MODE=1 python -m nativehtmlkit run check_hello:check     # prints: hello works
+NATIVEHTMLKIT_TEST_MODE=1 uv run -m nativehtmlkit run check_hello:check     # prints: hello works
 ```
 
 ## When something does not work
 
-- `nativehtmlkit-python version` exits with status 1 when no usable host is found: install a
+- `uv run nativehtmlkit-python version` exits with status 1 when no usable host is found: install a
   platform wheel for Linux x64 or Windows x64.
 - Nothing happens on a click: check that the `id` in `element=` matches the HTML. Run with
-  `nativehtmlkit-python --diagnostics trace run hello:build` and look for `document.dispatch`
+  `uv run nativehtmlkit-python --diagnostics trace run hello:build` and look for `document.dispatch`
   records with `matched: 0`.
 - More in [diagnostics and troubleshooting](guides/diagnostics-and-troubleshooting.md).
 

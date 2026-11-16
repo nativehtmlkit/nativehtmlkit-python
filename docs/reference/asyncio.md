@@ -111,14 +111,14 @@ async def amain(app: Application) -> None:
     await adapter.run()
 
 def main() -> None:
-    with Application.start(name="Async demo") as app:   # python app.py
+    with Application.start(name="Async demo") as app:   # uv run app.py
         asyncio.run(amain(app))
 
 if __name__ == "__main__":
     main()
 ```
 
-`python -m nativehtmlkit run app:amain` also works: the runner awaits a coroutine returned by the
+`uv run -m nativehtmlkit run app:amain` also works: the runner awaits a coroutine returned by the
 entry point (`asyncio.run`) and then calls `app.run()`, which returns at once when `amain` already
 waited for shutdown.
 
