@@ -123,4 +123,4 @@ entry point (`asyncio.run`) and then calls `app.run()`, which returns at once wh
 waited for shutdown.
 
 See the [asyncio guide](../guides/asyncio.md) and the examples
-[`async_counter.py`](../../examples/async_counter.py) and [`async_jobs.py`](../../examples/async_jobs.py).
+[`async_counter.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_counter.py) and [`async_jobs.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py).

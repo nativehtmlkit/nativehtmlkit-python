@@ -1,20 +1,13 @@
-# Packaging your app
+# Packaging and distribution
 
 A NativeHTMLKit application is an ordinary Python program that depends on the `nativehtmlkit`
 wheel; the wheel bundles the native host for its platform.
 
 ## Project layout
 
-`nativehtmlkit-new myapp --name "My App"` creates a starting point:
-
-```text
-myapp/
-  app.py          Application.start() entry point
-  index.html      the page, loaded with app.open_file(HERE / "index.html")
-  style.css       referenced from index.html (relative to the HTML file)
-  pyproject.toml  depends on nativehtmlkit
-  app.toml        optional manifest pinning the interpreter
-```
+Start from `nativehtmlkit-new myapp --name "My App"` (`app.py`, `index.html`, `style.css`,
+`pyproject.toml`, optional `app.toml`); [project scaffolding](project-scaffolding.md) explains
+each file and how to grow and test the project.
 
 Locate assets relative to your code, never the current directory:
 

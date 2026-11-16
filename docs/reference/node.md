@@ -78,5 +78,5 @@ Document methods that accept `element: str | Node` (`focus`, `blur`, `control_se
 `set_control_selection`, `replace_control_range`, `edit`, `reset_form`, `request_submit`,
 `form_data`, `set_custom_validity`, `computed_style`) take nodes too.
 
-The [DOM explorer example](../../examples/dom_explorer.py) walks and edits a tree of id-less
+The [DOM explorer example](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/dom_explorer.py) walks and edits a tree of id-less
 elements with these methods.

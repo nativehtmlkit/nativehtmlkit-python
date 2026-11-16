@@ -1,4 +1,4 @@
-# Background threads
+# Background work
 
 Event callbacks run one at a time on a single thread. Anything slow inside a callback (hashing
 files, network requests, a blocking dialog) delays every later event and makes the window feel
@@ -80,6 +80,43 @@ future = pool.submit(fetch_report, url)
 future.add_done_callback(lambda f: document.set_text("report", f.result()))
 ```
 
-Examples: [checksum.py](../../examples/checksum.py) (worker thread, progress, cancel, quit
-confirmation), [log_viewer.py](../../examples/log_viewer.py) (producer thread, bounded view),
-[live_chart.py](../../examples/live_chart.py) (frame producer).
+## A periodic refresh loop
+
+For data that should stay current (a process list, a status board), let one thread collect and
+render in a loop, and wait on a `threading.Event` between rounds. Setting the event wakes the
+thread early, which serves both "refresh now" and "stop":
+
+```python
+wake, stopped = threading.Event(), threading.Event()
+
+def loop():
+    while not stopped.is_set():
+        if not paused:
+            rows = collect()                 # slow: runs on this thread
+            render(rows)                     # SDK calls are thread-safe
+        wake.wait(refresh_seconds)
+        wake.clear()
+
+def stop():
+    stopped.set()
+    wake.set()
+
+app.on_shutdown(stop)
+threading.Thread(target=loop, daemon=True).start()
+```
+
+The [process dashboard tutorial](../tutorials/process-dashboard.md) builds this step by step.
+
+## asyncio instead of threads
+
+If your code is already `async`, run jobs as asyncio tasks and await the SDK through
+`app.async_adapter()`; see [asyncio integration](asyncio.md) and
+[async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py) (concurrent jobs with progress and cancel).
+
+## Examples
+
+- [checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py): worker thread, progress, cancel, quit confirmation
+- [log_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/log_viewer.py): producer thread, bounded view
+- [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py): frame producer
+- [process_dashboard/dashboard.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/process_dashboard/dashboard.py): periodic refresh, pause, resume
+- [async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py): the same idea with asyncio tasks

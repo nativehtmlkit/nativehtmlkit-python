@@ -48,7 +48,7 @@ document.on("close", lambda e: document.set_text("status", "Dialog closed"), ele
 ```
 
 Fill the form before `show_dialog` with `set_value`, `set_checked` and `set_selected_values`, and
-move focus with `document.focus(...)`. ([settings_dialog.py](../../examples/settings_dialog.py))
+move focus with `document.focus(...)`. ([settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py))
 
 ## Popovers
 

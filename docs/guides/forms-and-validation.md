@@ -81,5 +81,5 @@ document.options("country")     # [{"value", "label", "selected", "disabled"}, .
 Values typed by the user are untrusted. Put them into the page with `set_text`/`set_value`, or
 `html.escape()` them before `replace_html`/`insert_html` (see [security](security.md)).
 
-Example: [signup_form.py](../../examples/signup_form.py) (required fields, email, number range,
+Example: [signup_form.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/signup_form.py) (required fields, email, number range,
 select, checkbox group, password confirmation, error summary, welcome message).

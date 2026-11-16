@@ -4,8 +4,8 @@ In five steps you build a complete desktop todo list with the NativeHTMLKit Pyth
 window with HTML and CSS, adding items with a form, completing and deleting them, editing in
 place with keyboard support, and saving everything to a JSON file.
 
-Every step is a complete program in [`examples/tutorial/`](../../examples/tutorial/); the final
-result is [`examples/todo.py`](../../examples/todo.py). All of them are started and checked by this
+Every step is a complete program in [`examples/tutorial/`](https://github.com/nativehtmlkit/nativehtmlkit-python/tree/main/examples/tutorial); the final
+result is [`examples/todo.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/todo.py). All of them are started and checked by this
 repository's test suite against the real native host.
 
 **You need** Python 3.10+ on Linux x64 (glibc 2.39+) or Windows x64, and about 30 minutes.
@@ -57,7 +57,7 @@ What happened:
 - `app.open_html(...)` created a window and loaded the page into it.
 - `app.run()` told the host the app is ready and waits until it quits. Closing the window quits.
 
-Full file: [`step1_window.py`](../../examples/tutorial/step1_window.py).
+Full file: [`step1_window.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/tutorial/step1_window.py).
 
 ## Step 2: add items with a form
 
@@ -110,7 +110,7 @@ New ideas:
   `html.escape`. `set_text` and `set_value` never parse markup and need no escaping.
   ([Security](../guides/security.md))
 
-Full file: [`step2_add.py`](../../examples/tutorial/step2_add.py).
+Full file: [`step2_add.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/tutorial/step2_add.py).
 
 ## Step 3: complete and delete items
 
@@ -162,7 +162,7 @@ A little CSS strikes through completed items:
 li.done .text { text-decoration: line-through; color: #6b7385; }
 ```
 
-Full file: [`step3_complete_delete.py`](../../examples/tutorial/step3_complete_delete.py). More on
+Full file: [`step3_complete_delete.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/tutorial/step3_complete_delete.py). More on
 delegation in [events and callbacks](../guides/events-and-callbacks.md).
 
 ## Step 4: edit in place, with the keyboard
@@ -216,11 +216,11 @@ def on_key(self, event: dict) -> None:
 self.doc.on("keydown", self.on_key, element="todos")
 ```
 
-Full file: [`step4_edit_keyboard.py`](../../examples/tutorial/step4_edit_keyboard.py).
+Full file: [`step4_edit_keyboard.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/tutorial/step4_edit_keyboard.py).
 
 ## Step 5: save to a JSON file and polish
 
-The finished app, [`examples/todo.py`](../../examples/todo.py), adds persistence, filters,
+The finished app, [`examples/todo.py`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/todo.py), adds persistence, filters,
 "Clear completed", an empty state and a theme that follows the desktop's dark mode.
 
 **Where to store data.** The host knows per-application directories. Give the app a stable id,
@@ -298,5 +298,5 @@ Combine it with `request_submit`, `set_value` and read-back methods to test beha
 
 - [How-to guides](../guides/README.md): forms and validation, multiple windows, file dialogs,
   background threads, asyncio, live bitmaps, packaging.
-- [Examples](../../examples/README.md): fourteen more applications.
+- [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md): fourteen more applications.
 - [API reference](../API.md).

@@ -50,7 +50,7 @@ pending requests.
 
 **The window freezes / events arrive late.**
 A callback is busy (slow work, `wait=True` dialog). Look at `callback.completed` `duration_ms` in a
-trace. Move work to a [thread](background-threads.md) or use `wait=False`. Dropped events show up
+trace. Move work to a [thread](background-work.md) or use `wait=False`. Dropped events show up
 as `rpc.notification_dropped` and in `app.rpc.dropped_notifications`.
 
 **My `print()` output is missing.**
@@ -70,6 +70,25 @@ overrides the host for development.
 `document.diagnostics()` lists unsupported CSS and pending resources;
 `document.computed_style([...], "id")` shows the effective values and
 `document.command("explain", element="id", property="color")` explains one.
+
+## An About / Support window
+
+[diagnostics.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/diagnostics.py) puts the useful facts in one window: platform,
+renderer and headless state from `app.capabilities()`, which native services are available
+(`capabilities()["features"][name]["available"]`), the desktop preferences, loss counters from
+`app.host_diagnostics()` and the SDK recorder, and a **Save support bundle** button:
+
+```python
+from nativehtmlkit import diagnostics, export_support_bundle
+
+caps = app.capabilities()
+has_dialogs = caps["features"]["file_dialogs"]["available"]
+host = app.host_diagnostics()                      # dropped_notifications, pending_jobs, ...
+failures = sum(r["event"] == "callback.failed" for r in diagnostics.recorder().history())
+path = export_support_bundle(folder / "support.zip", overwrite=True)   # manifest.json + timeline.jsonl
+```
+
+The bundle is written locally and contains no document text, form values or paths.
 
 ## Testing without a desktop
 

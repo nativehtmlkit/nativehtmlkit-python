@@ -59,7 +59,7 @@ def main():                           # python focus_timer.py
         app.run()
 ```
 
-([focus_timer.py](../../examples/focus_timer.py))
+([focus_timer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/focus_timer.py))
 
 ## Start-up phase
 

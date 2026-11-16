@@ -72,5 +72,5 @@ The bitmap is released by `bitmap.close()` and automatically when its document i
 unloaded or closed; afterwards `present` raises. Limits: 1–4096 pixels per side, 8 bitmaps and
 64 MiB per document, 256 MiB per host (`RpcError` -32005 beyond that).
 
-Example: [live_chart.py](../../examples/live_chart.py) (30 fps scrolling chart with start/stop
+Example: [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py) (30 fps scrolling chart with start/stop
 and frame statistics). Reference: [LiveBitmap](../reference/live-bitmap.md).

@@ -91,6 +91,6 @@ application failure); quit with `request_quit` for an orderly end.
 `asyncio.run` and then calls `app.run()`. Because `amain` awaited `adapter.run()`, that final
 call returns at once.
 
-Examples: [async_counter.py](../../examples/async_counter.py) (minimal),
-[async_jobs.py](../../examples/async_jobs.py) (concurrent jobs with progress and cancel).
+Examples: [async_counter.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_counter.py) (minimal),
+[async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py) (concurrent jobs with progress and cancel).
 Reference: [asyncio](../reference/asyncio.md).

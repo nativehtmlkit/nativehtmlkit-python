@@ -59,13 +59,13 @@ scripts, less so for interactive windows.
 Headless runs (`NATIVEHTMLKIT_TEST_MODE=1`) and sessions without a dialog service raise `RpcError`
 -32001; a second dialog on the same window raises -32005. Check `app.capabilities()["features"]
 ["file_dialogs"]["available"]` up front or handle the error as above, and keep a fallback (a path
-input field) where it matters. ([checksum.py](../../examples/checksum.py) combines both.)
+input field) where it matters. ([checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py) combines both.)
 
 ## Reading the chosen file
 
 Paths are plain strings: use `pathlib.Path`. Check the size before reading, decode explicitly and
 show content with `set_value`/`set_text` (never as markup). The
-[file_viewer.py](../../examples/file_viewer.py) example does this, lists a chosen folder and saves
+[file_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/file_viewer.py) example does this, lists a chosen folder and saves
 with "Save As…".
 
 `<input type="file">` in a form is an alternative: the host shows the picker on click and

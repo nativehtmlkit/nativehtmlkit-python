@@ -1,4 +1,4 @@
-# Updating the DOM
+# Updating the page
 
 ## Text, values, attributes, classes
 
@@ -44,7 +44,10 @@ def render(items):
 
 Re-rendering a list of a few hundred rows this way is simple and fast. Handlers delegated to the
 container (`element="items"`) keep working. Table rows (`<tr>`) can be rendered into a `<tbody id>`.
-([data_table.py](../../examples/data_table.py))
+([data_table.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/data_table.py), [process_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/process_viewer.py))
+
+Keep accessibility attributes in step with the view, for example the sort state of a column
+header: `{"op": "set_attribute", "element": "col-Name", "name": "aria-sort", "value": "ascending"}`.
 
 ## Append without re-rendering
 
@@ -72,6 +75,22 @@ Batch ops: `set_text`, `set_attribute`, `remove_attribute`, `add_class`, `remove
 `insert_html`, `replace_children_html`, `remove_element`, `move_element`, `append_text`,
 `trim_children`. If one fails (say, an unknown id), the error names it and nothing changed.
 
+A batch is also the way to keep related changes consistent. The counter example updates the
+number, two state classes and a bounded history in one transaction
+([counter.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/counter.py)):
+
+```python
+document.batch([
+    {"op": "set_text", "element": "value", "text": str(value)},
+    {"op": "add_class" if value < 0 else "remove_class", "element": "value", "name": "negative"},
+    {"op": "insert_html", "element": "history", "position": "afterbegin",
+     "html": f"<li>{html.escape(f'{reason} -> {value}')}</li>"},
+    {"op": "trim_children", "element": "history", "keep": 8, "from": "end"},   # drop the oldest
+])
+```
+
+`trim_children` keeps `keep` children and removes the rest from the `start` or the `end`.
+
 ## Elements without ids
 
 Use [nodes](../reference/node.md):
@@ -82,7 +101,7 @@ first_item.add_class("active")
 document.node("menu").trim_children(10)          # keep the 10 newest children
 ```
 
-([dom_explorer.py](../../examples/dom_explorer.py))
+([dom_explorer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/dom_explorer.py))
 
 ## Counting and finding
 

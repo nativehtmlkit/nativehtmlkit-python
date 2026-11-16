@@ -8,9 +8,12 @@ NATIVEHTMLKIT_HOST_BINARY=/path/to/nativehtmlkit-host python -m pytest tests/int
 python3 scripts/package-local.py --help
 ```
 
-`tests/integration/test_examples.py` starts every program in `examples/` and `examples/tutorial/`
-until it is ready; `tests/integration/test_example_behaviour.py` drives each example's `build(...)`
-function inside the host and reads the DOM back (`example_checks.py`). Set `NHK_IT_DESKTOP=1` to
+`tests/integration/test_examples.py` starts every entry of `examples/catalog.toml` and every
+tutorial step until it is ready, and fails when a program under `examples/` is not catalogued;
+`tests/integration/test_example_behaviour.py` drives each entry's `build(...)` function inside the
+host and reads the DOM back (`example_checks.py`, one check per catalogue id).
+`tests/test_docs.py` checks the documentation tree (titles, links, canonical guides, verbatim
+tutorial excerpts) without a host. Set `NHK_IT_DESKTOP=1` to
 run the same scenarios with real windows on the current desktop, or
 `NATIVEHTMLKIT_TEST_INSTALLED=1` to test an installed wheel with its bundled host.
 

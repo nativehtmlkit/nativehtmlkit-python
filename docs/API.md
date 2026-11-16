@@ -106,7 +106,8 @@ Further classes referenced in these pages live in submodules: `nativehtmlkit.err
 
 ## More documentation
 
-- [Tutorial: build a todo app](tutorials/todo-app.md)
+- [Getting started](getting-started.md)
+- Tutorials: [todo app](tutorials/todo-app.md) · [bulk rename](tutorials/bulk-rename.md) · [process dashboard](tutorials/process-dashboard.md)
 - [How-to guides](guides/README.md)
 - [Architecture](ARCHITECTURE.md)
-- [Examples](../examples/README.md)
+- [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md)

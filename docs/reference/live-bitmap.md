@@ -82,5 +82,5 @@ bitmap.present(frame)
 
 Pure-Python per-pixel loops are slow; draw a background once and copy it
 (`bytearray(background)`), then touch only the pixels that change. The
-[live chart example](../../examples/live_chart.py) renders 480×200 at 30 frames per second this way.
+[live chart example](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py) renders 480×200 at 30 frames per second this way.
 See also the [live bitmaps guide](../guides/live-bitmaps.md).

@@ -86,4 +86,4 @@ if features["clipboard_text"]["available"] is False:
 
 `available` is `None` when the host has not observed the service yet; treat that as "try it".
 
-Example: [text_toolbox.py](../../examples/text_toolbox.py).
+Example: [text_toolbox.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/text_toolbox.py).

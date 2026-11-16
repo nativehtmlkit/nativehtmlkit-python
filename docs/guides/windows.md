@@ -89,5 +89,5 @@ After a window closed, `window.closed` is `True` and every call on it, its docum
 `StaleDocumentError` without contacting the host. Code that keeps windows in a dict should drop them
 on `closed`.
 
-Example: [window_manager.py](../../examples/window_manager.py) (note windows with unsaved-change
+Example: [window_manager.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/window_manager.py) (note windows with unsaved-change
 guards, a live window table with rename/resize/maximize/close, quit when the main window closes).

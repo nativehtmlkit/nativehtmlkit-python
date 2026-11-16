@@ -2,7 +2,7 @@
 
 **Native desktop windows from ordinary Python and local HTML/CSS.** The Rust Core host draws the interface; Python handles application logic and events. No browser, JavaScript, HTTP server, or Node.js runtime is required.
 
-[PyPI package](https://pypi.org/project/nativehtmlkit/) · [Tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/todo-app.md) · [How-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md) · [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) · [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) · [Public developer guide](https://github.com/nativehtmlkit/nativehtmlkit)
+[PyPI package](https://pypi.org/project/nativehtmlkit/) · [Getting started](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/getting-started.md) · [Tutorials](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/todo-app.md) · [How-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md) · [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) · [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) · [Public developer guide](https://github.com/nativehtmlkit/nativehtmlkit)
 
 ![Real NativeHTMLKit python-sdk gallery captured on linux](https://raw.githubusercontent.com/nativehtmlkit/nativehtmlkit/main/assets/python-sdk-linux.png)
 
@@ -56,8 +56,11 @@ Run `python hello.py` or `uv run hello.py`. `Application.start()` launches a sup
 | [async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py) | asyncio tasks, async callbacks |
 | [text_toolbox.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/text_toolbox.py) | Clipboard, links, desktop preferences |
 | [data_table.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/data_table.py) · [dom_explorer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/dom_explorer.py) | Rendering data, nodes without ids |
+| [bulk_rename/](https://github.com/nativehtmlkit/nativehtmlkit-python/tree/main/examples/bulk_rename) | A multi-file app: preview, confirmation dialog, undo ([tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/bulk-rename.md)) |
+| [process_dashboard/](https://github.com/nativehtmlkit/nativehtmlkit-python/tree/main/examples/process_dashboard) | Background refresh, pause, clipboard ([tutorial](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/process-dashboard.md)) |
+| [keyboard_shortcuts.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/keyboard_shortcuts.py) · [diagnostics.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/diagnostics.py) | Shortcuts and `prevent_default`; capabilities and support bundles |
 
-All [15 examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) are started and checked against the real host by the test suite.
+All [21 examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) are started and checked against the real host by the test suite.
 
 For layouts, reactive state and reusable controls, use the separate [Python UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui) rather than inventing new SDK surface.
 
@@ -65,11 +68,12 @@ For layouts, reactive state and reusable controls, use the separate [Python UI l
 
 | Guide | Purpose |
 |---|---|
-| [Tutorial: build a todo app](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/todo-app.md) | Learn the SDK step by step |
-| [How-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md) | Events, DOM updates, forms, windows, dialogs, threads, asyncio, bitmaps, packaging, security, troubleshooting |
+| [Getting started](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/getting-started.md) | Install, first window, how it runs, testing without a screen |
+| Tutorials: [todo app](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/todo-app.md) · [bulk rename](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/bulk-rename.md) · [process dashboard](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/tutorials/process-dashboard.md) | Learn the SDK step by step |
+| [How-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md) | Events, page updates, forms, windows, dialogs, keyboard and focus, styling, background work, asyncio, bitmaps, packaging, scaffolding, security, troubleshooting |
 | [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) | Every public class, method, parameter, result and error |
 | [Architecture](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/ARCHITECTURE.md) | Processes, host verification, IPC, threads, document generations |
-| [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) | 15 runnable applications and what each teaches |
+| [Examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) | 21 runnable applications and what each teaches |
 | [Build and testing](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/BUILD.md) | Release source, wheels and qualification |
 | [Public tutorials](https://github.com/nativehtmlkit/nativehtmlkit) | Screenshots, learning path and capability matrix |
 | [Skill](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/skills/nativehtmlkit-python/SKILL.md) | Agent instructions to build a Python app |
