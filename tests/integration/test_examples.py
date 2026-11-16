@@ -1,4 +1,4 @@
-"""Every file in examples/ must start against the real host, reach app.ready and stop cleanly.
+"""Every file in examples/ (and the tutorial steps in examples/tutorial/) must start against the real host, reach app.ready and stop cleanly.
 
 Readiness is observed from the SDK's own trace record (``rpc.completed`` for ``app.ready``).
 POSIX: SIGTERM to the launcher (documented exit 143). Windows: the launcher is killed
@@ -19,11 +19,12 @@ import pytest
 
 from test_real_host import DESKTOP, EXPORT_HOST, HOST, INSTALLED, SRC, _marker_processes
 
-EXAMPLES = sorted((Path(__file__).resolve().parents[2] / "examples").glob("*.py"))
+_ROOT = Path(__file__).resolve().parents[2] / "examples"
+EXAMPLES = sorted(_ROOT.glob("*.py")) + sorted((_ROOT / "tutorial").glob("*.py"))
 pytestmark = pytest.mark.skipif(not HOST, reason="BLOCKED: no host (set NATIVEHTMLKIT_HOST_BINARY)")
 
 
-@pytest.mark.parametrize("example", EXAMPLES, ids=[p.stem for p in EXAMPLES])
+@pytest.mark.parametrize("example", EXAMPLES, ids=[p.relative_to(_ROOT).with_suffix("").as_posix() for p in EXAMPLES])
 def test_example_reaches_ready_and_stops(tmp_path, example):
     marker = uuid.uuid4().hex[:12]
     diag = tmp_path / "diag"
