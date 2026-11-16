@@ -29,15 +29,29 @@ windows, the installed-wheel smoke with real windows and G6 on the KDE Wayland l
 G0/G2/G3/G4/G8 over admin SSH (Python 3.10 + 3.14) and then, inside the interactive RDP desktop of the test user,
 G3/G4 with real windows, installed-wheel smoke and G6. `NHK_GUI_LOCK` serialises shared desktops.
 
-## 0.1.1 (bundles Core 1.0.3) — qualification pending
+## Current status: 0.1.1 release
 
-Source adapted to Core 1.0.3: no launcher-side diagnostics mapping (`off` reaches the host; backend output is relayed
-at every level), strict id correlation for out-of-order `document.load` replies, host `dropped_notifications`
-recorded at shutdown, host source identity (`--version --verbose`) recorded in each wheel and cross-checked.
-Until the gates above are re-run against the final 1.0.3 hosts, 0.1.1 is **not** qualified; the 0.1.0 record below
-applies to 0.1.0 only.
+Released as tag `v0.1.1` at commit `f0b92903b79fbae4d8c292c6a5c8988b99391139` (source-tree SHA-256
+`24a32224a78ba19107bc78716fb350236f32437331893c1b0211f7512ff6b535`), bundling Core 1.0.3 (commit
+`d73dec36adbe1b1380f982388d13655750e607df`; Linux host
+`1cd4e9de701f3ef8d8b870b678765243f2365d69d7352c0543f171ff249c999f`, Windows host
+`15967208d2e20d208d69b97bba6f397056e28c57add126909a8734361ae8f8c8`); wire protocol v1 stable (1.0).
+Published on GitHub Releases <https://github.com/nativehtmlkit/nativehtmlkit-python/releases/tag/v0.1.1>
+and on PyPI <https://pypi.org/project/nativehtmlkit/0.1.1/> (wheels only, uploaded by the
+publish-only workflow from the release assets). Artifacts: manylinux_2_39_x86_64 wheel
+`5478384b9a10a130166e3d8877b25b13c7d5004a23165e0aa62aa686e7acffe4`, win_amd64 wheel
+`5ac1a1ef67b2f88e3f59630e01f0da8149dd4e4aa6b2fcfc05e8d4e77900cdd5`, sdist
+`143aecc65cd56373ac7619d9bf8a4207ed5f91ba677409b873641dff29777db2` (byte-reproducible,
+`twine check --strict` clean). Evidence (Project, git-ignored):
+`verification/2026-11-16-full-release/python/release/results.json` — 187 PASS, 0 FAIL, 4 BLOCKED
+(Linux headless 38/0/0, KDE Wayland 56/0/1, Windows headless 37/0/1, Windows RDP 55/0/2,
+packaging 1/0/0), Python 3.10–3.14, offline clean-install smoke on both platforms, 29/29 native GUI
+checks per desktop. BLOCKED by design: malformed-frame test in desktop mode; POSIX SIGTERM test on
+Windows. After publication, `pip install nativehtmlkit==0.1.1` from PyPI was checked on Linux
+(import, bundled host hash, a headless application); the PyPI install was not re-checked on Windows.
+The 0.1.0 record below applies to 0.1.0 only.
 
-## Current status: 0.1.0 release
+## Previous: 0.1.0 prerelease
 
 Published as a GitHub prerelease: tag `v0.1.0` at commit `7559b5b1f1e678017895789fabe3a1a6f59d5a74`
 (source-tree SHA-256 `81d2171524de9fb9ba68377115cf2dca0255dd261a052e5b6c596357367ad1c7`), built from that clean commit

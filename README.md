@@ -5,7 +5,7 @@ host: native HTML/CSS desktop windows, DOM/form/node operations, events, live bi
 services. **No browser, JavaScript, web server, PyO3 extension or Rust compiler** is needed by users of a
 platform wheel: the wheel embeds one prebuilt, SHA-256-pinned Core host. Pure standard library; Python ≥ 3.10.
 
-**Version 0.1.1** — bundles NativeHTMLKit Core 1.0.3. Wire protocol v1 is the **stable** wire contract (1.0)
+**Version 0.1.1** — released on [PyPI](https://pypi.org/project/nativehtmlkit/) and [GitHub Releases](https://github.com/nativehtmlkit/nativehtmlkit-python/releases/tag/v0.1.1); bundles NativeHTMLKit Core 1.0.3. Wire protocol v1 is the **stable** wire contract (1.0)
 since Core 1.0.3. This SDK version relies on Core 1.0.3 behaviour (backend output relayed at every diagnostics
 level, out-of-order `document.load` replies, notification backpressure counters); a host given through
 `NATIVEHTMLKIT_HOST_BINARY` should be 1.0.3 or later. Qualification record:
