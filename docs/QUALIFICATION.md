@@ -29,12 +29,20 @@ windows, the installed-wheel smoke with real windows and G6 on the KDE Wayland l
 G0/G2/G3/G4/G8 over admin SSH (Python 3.10 + 3.14) and then, inside the interactive RDP desktop of the test user,
 G3/G4 with real windows, installed-wheel smoke and G6. `NHK_GUI_LOCK` serialises shared desktops.
 
+## 0.1.1 (bundles Core 1.0.3) — qualification pending
+
+Source adapted to Core 1.0.3: no launcher-side diagnostics mapping (`off` reaches the host; backend output is relayed
+at every level), strict id correlation for out-of-order `document.load` replies, host `dropped_notifications`
+recorded at shutdown, host source identity (`--version --verbose`) recorded in each wheel and cross-checked.
+Until the gates above are re-run against the final 1.0.3 hosts, 0.1.1 is **not** qualified; the 0.1.0 record below
+applies to 0.1.0 only.
+
 ## Current status: 0.1.0 release
 
 Published as a GitHub prerelease: tag `v0.1.0` at commit `7559b5b1f1e678017895789fabe3a1a6f59d5a74`
 (source-tree SHA-256 `81d2171524de9fb9ba68377115cf2dca0255dd261a052e5b6c596357367ad1c7`), built from that clean commit
 against the clean Core 1.0.2 release directories (Core commit `8a09875cff58aa16b60573ffca24de4d611d60b3`). Not on PyPI;
-wire protocol v1 remains `1.0-rc`.
+wire protocol v1 was then still `1.0-rc` (declared stable, 1.0, with Core 1.0.3).
 
 | Artifact | SHA-256 |
 |---|---|

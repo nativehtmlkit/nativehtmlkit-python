@@ -562,8 +562,9 @@ def test_rr3_stop_from_wrapper_task_inside_callback_does_not_hang(wrapper):
     asyncio.run(main())
 
 
-def test_rr4_host_wrapper_maps_off_for_the_host(monkeypatch, tmp_path):
-    """The nativehtmlkit-python-host exec path must apply the same diagnostics mapping (FR-PY-01)."""
+def test_rr4_host_wrapper_passes_diagnostics_level_unchanged(monkeypatch, tmp_path):
+    """Core 1.0.3 relays backend output at every level (NHK-CROSS-0007 fixed): the host wrapper, like every
+    launch path, now passes `off` through unchanged (the 0.1.0 interim off->normal mapping is gone)."""
     from nativehtmlkit import launcher
     fake = tmp_path / launcher.HOST_NAME
     fake.write_bytes(b"x")
@@ -577,8 +578,8 @@ def test_rr4_host_wrapper_maps_off_for_the_host(monkeypatch, tmp_path):
         launcher.main()
     except SystemExit:
         pass
-    assert seen["env"]["NATIVEHTMLKIT_DIAGNOSTICS"] == "normal"
-    assert seen["env"]["NATIVEHTMLKIT_SDK_DIAGNOSTICS"] == "off"
+    assert seen["env"]["NATIVEHTMLKIT_DIAGNOSTICS"] == "off"
+    assert "NATIVEHTMLKIT_SDK_DIAGNOSTICS" not in seen["env"]
 
 
 def test_m06_string_values_must_be_short_identifiers():

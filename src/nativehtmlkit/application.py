@@ -46,6 +46,7 @@ class Application:
         self._windows: dict[str, Window] = {}
         self._ready = False
         self._ran = False
+        self.host_dropped_notifications: int | None = None
         self._window_listeners: list[Callable[[dict], Any]] = []
         self._shutdown_listeners: list[Callable[[], Any]] = []
         self.rpc.on_notification("document.event", self._document_event)
@@ -135,6 +136,26 @@ class Application:
                 self._windows[window.id] = window
         return window
 
+    def host_diagnostics(self, *, timeout: float = 5.0) -> dict:
+        """The host's own counters (``host.diagnostics``; allowed even while shutting down).
+
+        Includes ``dropped_notifications`` (Core >= 1.0.3): window/document events the HOST dropped
+        because this backend stopped reading. The SDK's reader never runs application code, so this
+        stays 0 unless the process itself stalls; events the SDK drops because a callback blocked its
+        own queue are counted separately in ``rpc.dropped_notifications``.
+        """
+        return self.rpc.call("host.diagnostics", timeout=timeout)
+
+    def _record_host_drops(self) -> None:
+        try:
+            dropped = self.host_diagnostics(timeout=2.0).get("dropped_notifications")
+        except Exception:  # best effort during shutdown (older hosts lack the member)
+            return
+        if isinstance(dropped, int) and not isinstance(dropped, bool):
+            self.host_dropped_notifications = dropped
+            diagnostics.record("host.notifications_dropped", level="WARN" if dropped else "DEBUG", dropped=dropped,
+                               sdk_dropped=getattr(self.rpc, "dropped_notifications", 0))
+
     def _shutdown_seen(self) -> bool:
         flag = getattr(self.rpc, "shutdown_requested", None)
         return bool(flag is not None and flag.is_set())
@@ -195,6 +216,7 @@ class Application:
         drain = getattr(self.rpc, "wait_for_notifications", None)
         if drain is not None:
             drain(2.0)
+        self._record_host_drops()
         self._retire_all()
         for callback in list(self._shutdown_listeners):
             try:

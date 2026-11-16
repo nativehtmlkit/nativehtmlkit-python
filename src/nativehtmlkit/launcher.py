@@ -115,7 +115,21 @@ def host_info() -> dict:
         info["manifest_match"] = False
     elif manifest.get("host_sha256"):
         info["manifest_match"] = manifest["host_sha256"] == info["sha256"]
+    info["source_identity"], info["source_identity_match"] = None, None
+    try:  # Core >= 1.0.3: `--version --verbose` prints the build's source identity as JSON
+        out = subprocess.run([str(binary), "--version", "--verbose"], capture_output=True, text=True, timeout=15)
+        identity = json.loads(out.stdout.strip().splitlines()[-1]) if out.returncode == 0 and out.stdout.strip() else None
+    except (OSError, ValueError, IndexError, subprocess.SubprocessError):
+        identity = None
+    if isinstance(identity, dict):
+        info["source_identity"] = identity
+        pinned = manifest.get("host_source_identity") if source == "bundled" else None
+        if isinstance(pinned, dict):
+            info["source_identity_match"] = all(identity.get(k) == pinned.get(k) for k in IDENTITY_KEYS)
     return info
+
+
+IDENTITY_KEYS = ("version", "source_commit", "source_dirty", "source_tree")
 
 
 def main() -> int:
@@ -128,8 +142,7 @@ def main() -> int:
     except (OSError, FileNotFoundError) as error:
         print(str(error), file=sys.stderr)
         return 1
-    from ._bootstrap import _host_environment
-    env = _host_environment(dict(os.environ))  # same diagnostics mapping as every launch path
+    env = dict(os.environ)
     if os.name == "posix":
         # Replace this Python wrapper with the native host so signals from a
         # process manager (SIGTERM, SIGHUP) reach the host itself instead of

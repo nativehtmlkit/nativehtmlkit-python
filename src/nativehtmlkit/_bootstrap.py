@@ -304,21 +304,12 @@ class _Interrupted(Exception):
         self.signum = signum
 
 
-def _host_environment(env: dict[str, str]) -> dict[str, str]:
-    """Core relays backend print() output and tracebacks as host log records, which its
-    level filter drops at ``off`` (NHK-CROSS-0007). Disclosed interim behaviour: ``off`` switches
-    off the SDK's own records (NATIVEHTMLKIT_SDK_DIAGNOSTICS) but the host runs at ``normal`` so
-    application output always survives."""
-    level = env.get("NATIVEHTMLKIT_DIAGNOSTICS", "").strip().lower()
-    if level == "off":
-        env = dict(env, NATIVEHTMLKIT_DIAGNOSTICS="normal", NATIVEHTMLKIT_SDK_DIAGNOSTICS="off")
-    return env
-
-
 def run_host(command: list[str], *, env: dict[str, str]) -> int:
     """Run the host, relay its output, and return its exit status. Ctrl+C,
     SIGTERM or SIGHUP stop the host (and with it the backend) boundedly."""
-    process, _job = spawn_host(command, env=_host_environment(env))
+    # The level (including ``off``) is passed to the host unchanged: since Core 1.0.3 the host relays
+    # backend output at every level (NHK-CROSS-0007 fixed), so no launcher-side mapping is needed.
+    process, _job = spawn_host(command, env=env)
     verbose = os.environ.get(VERBOSE, "").strip().lower() not in ("", "0", "false", "no")
     previous = {}
 

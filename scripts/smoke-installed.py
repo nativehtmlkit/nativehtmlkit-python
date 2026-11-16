@@ -96,6 +96,7 @@ def smoke(python: str, wheel: Path, expected: str, out: Path, desktop: bool) -> 
         checks["host_manifest_matches"] = host["manifest_match"] is True
         checks["protocol_v1"] = version["protocol_version"] == 1 and host["manifest"]["protocol_version"] == 1
         checks["core_notices_installed"] = (Path(host["path"]).parent / "core-licenses/THIRD_PARTY_NOTICES.md").is_file()
+        checks["host_source_identity_matches"] = host.get("source_identity_match") is True
     else:
         report["logs"]["version"] = result.stderr[-2000:]
     project = work / "scaffolded"

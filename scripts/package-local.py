@@ -124,6 +124,39 @@ def parse_host(spec: str) -> tuple[str, Path, str]:
     return platform, Path(path).expanduser().resolve(), expected.lower()
 
 
+IDENTITY_KEYS = ("version", "source_commit", "source_dirty", "source_tree")
+
+
+def host_source_identity(host: Path, platform: str, release_dir: Path, actual_sha: str) -> dict:
+    """Source identity of the embedded host, cross-checked against the Core release manifest.
+
+    On the host's own platform `host --version --verbose` (Core >= 1.0.3) is executed and must agree
+    with release-manifest.json; a host for another platform cannot run here, so its identity is taken
+    from the manifest and verified at install time by `nativehtmlkit-python version`.
+    """
+    manifest_file = release_dir / "release-manifest.json"
+    if not manifest_file.is_file():
+        raise PackagingError(f"{manifest_file} missing: the Core release manifest is required")
+    release = json.loads(manifest_file.read_text(encoding="utf-8"))
+    if release.get("host_sha256") not in (None, actual_sha):
+        raise PackagingError("Core release-manifest.json pins a different host SHA-256")
+    if release.get("platform") not in (None, platform):
+        raise PackagingError(f"Core release-manifest.json is for {release.get('platform')}, not {platform}")
+    from_release = {k: release.get(k) for k in IDENTITY_KEYS}
+    native = (platform == "windows-x64") == (os.name == "nt")
+    if not native:
+        return {**from_release, "checked_by": "release-manifest"}
+    out = subprocess.run([str(host), "--version", "--verbose"], capture_output=True, text=True, timeout=30)
+    try:
+        executed = json.loads(out.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        raise PackagingError("host --version --verbose did not print a JSON source identity") from None
+    mismatched = [k for k in IDENTITY_KEYS if executed.get(k) != from_release.get(k)]
+    if mismatched:
+        raise PackagingError(f"host source identity disagrees with release-manifest.json on {mismatched}")
+    return {**{k: executed.get(k) for k in IDENTITY_KEYS}, "checked_by": "host --version --verbose + release-manifest"}
+
+
 def copy_core_notices(source: Path, destination: Path) -> list[str]:
     """The wheel redistributes Core: ship its licence and third-party notices (fail closed)."""
     required = [source / "LICENSE", source / "THIRD_PARTY_NOTICES.md"]
@@ -247,12 +280,14 @@ def main(argv=None) -> int:
             target.write_bytes(data)
             target.chmod(0o755)
             notices = copy_core_notices(args.core_notices or path.parent, target.parent / "core-licenses")
+            identity = host_source_identity(path, platform, args.core_notices or path.parent, actual)
             manifest = {"schema_version": 1, "sdk_version": version, "core_version": args.core_version,
                         "protocol_version": 1, "host_sha256": actual, "host_file": host_name,
                         "platform": platform, "source_tree_sha256": tree_sha,
                         "contract_method_matrix_sha256": CONTRACT_SHA,
                         "glibc_floor": glibc_floor(data) if platform == "linux-x64" else None,
                         "core_notices": notices,
+                        "host_source_identity": identity,
                         "qualification": "UNQUALIFIED until the recorded host+SDK pair passes native gates"}
             (target.parent / "HOST-MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
             wheel = build(staged, "wheel", out, env=env)

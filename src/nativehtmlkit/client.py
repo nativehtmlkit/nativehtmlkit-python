@@ -24,7 +24,7 @@ from . import diagnostics
 from .errors import (RpcTimeoutError, NativeHTMLKitError, HostDisconnectedError, HostProtocolError,
                      LocalRequestError)
 
-CLIENT_VERSION = "0.1.0"  # Kept equal to nativehtmlkit.__version__ (checked by tests).
+CLIENT_VERSION = "0.1.1"  # Kept equal to nativehtmlkit.__version__ (checked by tests).
 
 MAX_FRAME_BYTES = 2 * 1024 * 1024
 MAX_PENDING = 128

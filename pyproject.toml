@@ -4,14 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nativehtmlkit"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python SDK for the NativeHTMLKit native HTML/CSS desktop host"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+license-files = ["LICENSE"]
 authors = [{name = "NativeHTMLKit contributors"}]
 keywords = ["native", "desktop", "html", "css", "gui", "rust", "wayland", "windows"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Win32 (MS Windows)",
+    "Environment :: X11 Applications",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: User Interfaces",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -25,6 +34,10 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/nativehtmlkit/nativehtmlkit-python"
 Source = "https://github.com/nativehtmlkit/nativehtmlkit-python"
+Issues = "https://github.com/nativehtmlkit/nativehtmlkit-python/issues"
+Releases = "https://github.com/nativehtmlkit/nativehtmlkit-python/releases"
+Documentation = "https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/README.md"
+"Core host" = "https://github.com/nativehtmlkit/nativehtmlkit-core"
 
 [project.scripts]
 nativehtmlkit-python = "nativehtmlkit.__main__:main"

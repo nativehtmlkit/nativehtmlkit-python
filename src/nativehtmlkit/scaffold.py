@@ -63,7 +63,7 @@ name = "{slug}"
 version = "1.0.0"
 description = {toml_string(name + " - a native desktop app built with HTML, CSS and Python")}
 requires-python = ">=3.10"
-dependencies = ["nativehtmlkit>=0.1.0"]
+dependencies = ["nativehtmlkit>=0.1.1"]
 '''
     code = f'''"""A native desktop window built with HTML, CSS and Python.
 

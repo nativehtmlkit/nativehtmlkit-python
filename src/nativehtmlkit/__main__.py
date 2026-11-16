@@ -104,7 +104,8 @@ def main(argv=None) -> int:
                     "python": sys.version.split()[0], "host": host_info()}
             print(json.dumps(info, indent=2, sort_keys=True))
             host = info["host"]
-            return 0 if host.get("path") and host.get("manifest_match") is not False else 1
+            return 0 if (host.get("path") and host.get("manifest_match") is not False
+                         and host.get("source_identity_match") is not False) else 1
         if args.command == "support":
             session = args.session or diagnostics.latest_session() or diagnostics.SESSION_ID
             print(diagnostics.export_bundle(args.output, capture_environment=True, session=session,

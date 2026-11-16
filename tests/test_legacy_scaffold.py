@@ -36,7 +36,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(ids, [manifest['app']['id']])
             project=tomllib.loads((dest/'pyproject.toml').read_text())['project']
             self.assertEqual(project['name'], 'my-workspace')
-            self.assertEqual(project['dependencies'], ['nativehtmlkit>=0.1.0'])
+            self.assertEqual(project['dependencies'], ['nativehtmlkit>=0.1.1'])
             self.assertIn('id="add-item"',(dest/'index.html').read_text())
             with self.assertRaises(FileExistsError):
                 scaffold.create_project(dest, name='again')

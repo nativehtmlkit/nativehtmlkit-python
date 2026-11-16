@@ -151,6 +151,10 @@ def api_main(app):
               and diag.get("pid") not in (None, os.getpid()), backend_pid=diag.get("backend_pid"))
         emit("info", name="backend_pid_is_self", value=diag.get("backend_pid") == os.getpid())
         emit("info", name="host_logging_counters", value=diag.get("logging"))
+        # Core >= 1.0.3: events the host dropped because this backend stopped reading (the SDK reader
+        # never runs application code, so this must stay 0).
+        check("lowlevel.host_dropped_notifications_zero", diag.get("dropped_notifications") == 0,
+              value=diag.get("dropped_notifications"))
         error = expect_raises("lowlevel.unknown_method", RpcError, app.rpc.call, "no.such_method")
         check("lowlevel.unknown_method_code", getattr(error, "code", None) == -32601
               and getattr(error, "operation", None) == "no.such_method" and getattr(error, "request_id", None))
@@ -162,6 +166,28 @@ def api_main(app):
         if caps.get("headless"):
             error = expect_raises("dialogs.headless_unsupported", RpcError, window.open_files)
             check("dialogs.headless_code", getattr(error, "code", None) == -32001)
+    with Guard("out_of_order_load"):
+        # Core >= 1.0.3 answers path loads when the file read finishes: later replies may come first.
+        folder = Path(tempfile.mkdtemp(prefix="nhk-it-load-"))
+        page = folder / "big.html"
+        page.write_text("<p id='big'>" + ("y" * 800_000) + "</p>", encoding="utf-8")
+        loader = app.open_html("<p>loader</p>", title="IT load order", width=200, height=120)
+        order = []
+        load = app.rpc.call_async("document.load", {"window_id": loader.id, "path": str(page)})
+        load.add_done_callback(lambda f: order.append("load"))
+        quick = [app.rpc.call_async("window.get", {"window_id": window.id}) for _ in range(5)]
+        for future in quick:
+            future.add_done_callback(lambda f: order.append("get"))
+        loaded = load.result(30)
+        gets = [future.result(30) for future in quick]
+        check("ordering.load_reply_correlated_by_id", isinstance(loaded.get("document_id"), str)
+              and loaded.get("window_id") == loader.id, result_keys=sorted(loaded))
+        check("ordering.later_replies_correlated", all(g.get("window_id") == window.id for g in gets))
+        emit("info", name="load_reply_order", value=order)
+        loader.request_close()  # non-last window before app.ready: closes only it (Core >= 1.0.2)
+        settle = time.monotonic() + 10
+        while not loader.closed and time.monotonic() < settle:
+            time.sleep(0.05)
     with Guard("limits"):
         error = expect_raises("limits.host_rejects_oversize_html", RpcError, window.load_html, "x" * (1024 * 1024 + 10))
         check("limits.oversize_html_code", getattr(error, "code", None) == -32005)

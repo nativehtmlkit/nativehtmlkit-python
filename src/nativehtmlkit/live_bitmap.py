@@ -45,8 +45,8 @@ class LiveBitmap:
         self.slot_bytes = int(response["slot_bytes"])
         if (self.stride, self.slot_bytes) != (width * 4, width * height * 4):
             raise RuntimeError("Host returned invalid bitmap geometry")
-        # Only the host-returned location is used (Core 1.0.2: a private per-host
-        # directory on Linux, %TEMP% on Windows; the name includes the host pid).
+        # Only the host-returned location is used (Core 1.0.3: a private per-host directory on
+        # Linux, %TEMP%\nativehtmlkit-bitmaps\ on Windows; the name includes the host pid).
         path = Path(response["path"])
         self.path = path
         try:

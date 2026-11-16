@@ -76,10 +76,7 @@ class DiagnosticRecorder:
     def __init__(self, *, level: str | None = None, directory: Path | None = None,
                  max_history: int = 256, max_pending: int = 1024,
                  max_file_bytes: int = 16 * 1024 * 1024):
-        # NATIVEHTMLKIT_SDK_DIAGNOSTICS (set by the launcher) controls only this recorder; the
-        # shared NATIVEHTMLKIT_DIAGNOSTICS also reaches the host (see _bootstrap._host_environment).
-        self.level = (level or os.getenv("NATIVEHTMLKIT_SDK_DIAGNOSTICS")
-                      or os.getenv("NATIVEHTMLKIT_DIAGNOSTICS", "normal")).lower()
+        self.level = (level or os.getenv("NATIVEHTMLKIT_DIAGNOSTICS", "normal")).lower()
         if self.level not in LEVELS:
             self.level = "normal"
         self.max_file_bytes = max_file_bytes

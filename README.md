@@ -5,11 +5,29 @@ host: native HTML/CSS desktop windows, DOM/form/node operations, events, live bi
 services. **No browser, JavaScript, web server, PyO3 extension or Rust compiler** is needed by users of a
 platform wheel: the wheel embeds one prebuilt, SHA-256-pinned Core host. Pure standard library; Python ≥ 3.10.
 
-**Status: 0.1.0 prerelease published on GitHub Releases
-(<https://github.com/nativehtmlkit/nativehtmlkit-python/releases/tag/v0.1.0>); locally qualified on Linux KDE
-Wayland and an interactive Windows desktop (see [`docs/QUALIFICATION.md`](docs/QUALIFICATION.md)); wire protocol v1 is
-still a release candidate (`1.0-rc`); not on PyPI.** Install a downloaded wheel with
-`python -m pip install --no-index ./nativehtmlkit-0.1.0-py3-none-<platform>.whl`.
+**Version 0.1.1** — bundles NativeHTMLKit Core 1.0.3. Wire protocol v1 is the **stable** wire contract (1.0)
+since Core 1.0.3. This SDK version relies on Core 1.0.3 behaviour (backend output relayed at every diagnostics
+level, out-of-order `document.load` replies, notification backpressure counters); a host given through
+`NATIVEHTMLKIT_HOST_BINARY` should be 1.0.3 or later. Qualification record:
+[`docs/QUALIFICATION.md`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/QUALIFICATION.md). Releases: <https://github.com/nativehtmlkit/nativehtmlkit-python/releases>.
+
+## Install
+
+```bash
+python -m pip install nativehtmlkit
+```
+
+Only two platform wheels are published (there is no source distribution on PyPI):
+
+| Platform | Wheel tag | Requirement |
+|---|---|---|
+| Linux x86-64 | `manylinux_2_39_x86_64` | glibc ≥ 2.39 (e.g. Ubuntu 24.04+, Debian 13, Fedora 40+) and a desktop session (Wayland/X11) |
+| Windows x64 | `win_amd64` | Windows 10/11 or Server 2022, interactive desktop |
+
+CPython 3.10–3.14. On any other platform (macOS, ARM, 32-bit, older glibc) pip finds no compatible
+distribution and reports that no matching distribution was found; nothing is built from source. A downloaded
+release wheel installs offline with `python -m pip install --no-index ./nativehtmlkit-0.1.1-py3-none-<tag>.whl`.
+`nativehtmlkit-python version` shows the bundled host, its SHA-256 and whether it matches the pinned manifest.
 
 ## Run an app
 
@@ -127,11 +145,9 @@ NATIVEHTMLKIT_DIAGNOSTICS=trace python app.py         # or: python -m nativehtml
 python -m nativehtmlkit support ./support.zip           # explicit; latest recorded session (or --session ID)
 ```
 
-- Levels `off|normal|debug|trace` (shared with Core). **`off`** disables the SDK's own records, but the SDK
-  launcher starts the host at `normal`: Core 1.0.2 relays backend `print()` output and tracebacks through its
-  log filter and would drop them at `off` (NHK-CROSS-0007). This is a disclosed interim behaviour — the
-  host's normal-level lifecycle records still appear — until Core relays backend output independently.
-  (`NATIVEHTMLKIT_SDK_DIAGNOSTICS`, set by the launcher, carries the SDK-only level to the backend.)
+- Levels `off|normal|debug|trace` (shared with Core and passed to the host unchanged). Application `print()`
+  output and tracebacks are relayed at every level, including `off` (Core ≥ 1.0.3; with a Core 1.0.2 host
+  given through `NATIVEHTMLKIT_HOST_BINARY` they are lost at `off`, NHK-CROSS-0007).
 - `normal` keeps a bounded in-memory history only;
   `debug`/`trace` also write `python-<session>-<pid>.jsonl` (0600) under `NATIVEHTMLKIT_DIAGNOSTICS_DIR`
   (default `~/.local/state/nativehtmlkit/diagnostics`, Windows `%LOCALAPPDATA%\NativeHTMLKit\diagnostics`).
@@ -162,8 +178,10 @@ a test checks every method/op the SDK sends exists in it.
 
 ## Known limitations and host-version notes
 
-- Linux wheels are tagged `manylinux_<glibc floor>_x86_64` from the embedded host (Core 1.0.2: glibc ≥ 2.39,
-  e.g. Ubuntu 24.04+/Debian 13); installers refuse older systems. `scripts/package-local.py` output is
+- Linux wheels are tagged `manylinux_<glibc floor>_x86_64` from the embedded host (Core 1.0.3: glibc ≥ 2.39,
+  e.g. Ubuntu 24.04+/Debian 13); installers refuse older systems. Each wheel records the host's source
+  identity (`--version --verbose`), cross-checked against the Core release manifest when packaging and by
+  `nativehtmlkit-python version` on the target. `scripts/package-local.py` output is
   reproducible (fixed `SOURCE_DATE_EPOCH`, normalised archives). The sdist contains no host: installing it
   fails with an explanation unless `NATIVEHTMLKIT_DEV_SOURCE_ONLY=1` (then set `NATIVEHTMLKIT_HOST_BINARY`).
 
@@ -172,8 +190,19 @@ a test checks every method/op the SDK sends exists in it.
   user close) before `app.ready` still cancels startup. With Core 1.0.1 any early close cancelled startup.
 - Closing the last window shuts down without a `window.event` `closed` for it (documented v1 behaviour); rely on
   `app.shutdown` / `on_shutdown`, after which all handles are stale.
-- Live bitmaps: only the transport path returned by the host is used; Core 1.0.2 refuses allocations beyond
-  64 MiB per document or 256 MiB per host with `RpcError` code -32005 (`local=False`).
+- Live bitmaps: only the transport path returned by the host is used (Core 1.0.3: a private runtime directory on
+  Linux, `%TEMP%\nativehtmlkit-bitmaps\` on Windows); allocations beyond 64 MiB per document or 256 MiB per host
+  are refused with `RpcError` code -32005 (`local=False`).
+- Core ≥ 1.0.3 answers `document.load` with `path`/`asset_root` when the file read finishes, so replies to later
+  requests can arrive first; the SDK correlates strictly by request id (sync and asyncio).
+- Core ≥ 1.0.3 drops `window.event`/`document.event` notifications (counted in `host.diagnostics`
+  `dropped_notifications`) if a backend stops reading. The SDK's reader never runs application code, so this
+  stays 0; events the SDK itself drops because a callback blocks its own 128-event queue are counted in
+  `rpc.dropped_notifications`. Both counters are recorded at shutdown (`host.notifications_dropped`) and
+  `Application.host_diagnostics()` returns the host's counters. Do not block event callbacks for long.
+- Core ≥ 1.0.3 presents a new window when its first document loads (at the latest after 750 ms); on Windows
+  `observed.visible` in `window.state()` is `false` until then. New windows are kept inside the monitor's work area;
+  `width`/`height` stay as requested, `physical_size`/`observed.position` report the actual geometry.
 - Drag/resize regions (`data-ui4me-drag`, `data-ui4me-resize`) work only on frameless windows (`decorations=False`).
 - A callback blocked forever in user code keeps its daemon worker thread; `close()` joins callback workers for at
   most 0.5 s in total, then leaves them and records `callback.worker_abandoned`.
@@ -200,4 +229,10 @@ tests/native/qualify-linuxdev.sh HOST SHA EVIDENCE    # lab: workstation + KDE W
 tests/native/qualify-windev.sh 'F:\...\nativehtmlkit-host.exe' SHA EVIDENCE   # lab: Windows SSH + RDP desktop
 ```
 
-Builds and tests are local only. The one GitHub Actions workflow, `.github/workflows/pypi_publish.yml`, is publish-only: on manual dispatch it uploads the wheels of an existing GitHub Release to PyPI after verifying their checksums. No publication without explicit owner approval. See `docs/QUALIFICATION.md`.
+Builds and tests are local only. The one GitHub Actions workflow, `.github/workflows/pypi_publish.yml`, is publish-only: on manual dispatch it uploads the wheels of an existing GitHub Release to PyPI after verifying their checksums. No publication without explicit owner approval. See [`docs/QUALIFICATION.md`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/QUALIFICATION.md).
+
+## Licence
+
+The SDK's own code is MIT-licensed ([`LICENSE`](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/LICENSE)). Each platform wheel also contains the
+prebuilt NativeHTMLKit Core host (MIT) together with its third-party licences and notices (including OFL-1.1 for
+the embedded font, MPL-2.0 components and CC-BY-4.0 stylesheets) in `nativehtmlkit/_bin/core-licenses/`.
