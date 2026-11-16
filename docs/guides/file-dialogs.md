@@ -57,8 +57,10 @@ scripts, less so for interactive windows.
 ## When dialogs are unavailable
 
 Headless runs (`NATIVEHTMLKIT_TEST_MODE=1`) and sessions without a dialog service raise `RpcError`
--32001; a second dialog on the same window raises -32005. Check `app.capabilities()["features"]
-["file_dialogs"]["available"]` up front or handle the error as above, and keep a fallback (a path
+-32001; a second dialog on the same window raises -32005. Check `app.capabilities()["file_dialogs"]`
+up front (the top-level flag: does the host offer dialogs in this session?) or handle the error as
+above. `capabilities()["features"]["file_dialogs"]["available"]` is `None` ("not observed") on a native
+desktop with Core 1.0.3, so do not treat `None` as "no dialogs". Either way, and keep a fallback (a path
 input field) where it matters. ([checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py) combines both.)
 
 ## Reading the chosen file

@@ -37,12 +37,33 @@ def _linux_processes() -> list[Process]:
         except OSError:          # the process ended, or access is denied
             continue
         # The name is in parentheses and may itself contain spaces or ')'.
-        name = stat[stat.index("(") + 1:stat.rindex(")")]
+        name = _full_name(entry, stat[stat.index("(") + 1:stat.rindex(")")])
         fields = stat[stat.rindex(")") + 2:].split()
         cpu = (int(fields[11]) + int(fields[12])) / tick       # utime + stime
         memory = int(fields[21]) * page / 2**20                 # rss pages
         result.append(Process(name, int(entry), round(memory, 1), round(cpu, 1)))
     return result
+
+
+def _full_name(pid: str, comm: str) -> str:
+    """The kernel truncates comm to 15 characters; take the full name from argv[0] or the executable."""
+    if len(comm) < 15:
+        return comm
+    candidates = []
+    try:
+        with open(f"/proc/{pid}/cmdline", "rb") as handle:
+            candidates.append(handle.read().split(b"\0", 1)[0].decode("utf-8", errors="replace"))
+    except OSError:
+        pass
+    try:
+        candidates.append(os.readlink(f"/proc/{pid}/exe"))
+    except OSError:                      # other users' processes: no access
+        pass
+    for candidate in candidates:
+        base = os.path.basename(candidate)
+        if base.startswith(comm):
+            return base
+    return comm
 
 
 def _windows_processes() -> list[Process]:

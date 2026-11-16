@@ -1,7 +1,8 @@
 """Diagnostics: an "About / Support" window with capabilities, counters and a support bundle.
 
 What it teaches
-  * ``Application.capabilities()`` for feature detection (``features[name]["available"]``)
+  * ``Application.capabilities()`` for feature detection: the top-level flags say which APIs the
+    host offers; ``features[name]["available"]`` is True/False when observed and None otherwise
   * ``Application.desktop_preferences()`` (colour scheme, reduced motion, high contrast)
   * ``Application.host_diagnostics()`` and the SDK recorder (``nativehtmlkit.diagnostics``):
     loss and failure counters
@@ -43,7 +44,25 @@ PAGE = """<!doctype html>
   <p id="bundle" role="status"></p>
 </body></html>"""
 
-FEATURES = ("clipboard_text", "file_dialogs", "external_open", "incoming_drop", "ime", "accessibility")
+# Top-level capability flag -> its entry in capabilities()["features"] (the host names drops differently).
+FEATURES = {"clipboard_text": "clipboard_text", "file_dialogs": "file_dialogs", "external_open": "external_open",
+            "drag_drop": "incoming_drop", "ime": "ime", "accessibility": "accessibility"}
+
+
+def feature_state(caps: dict, flag: str) -> tuple[str, bool]:
+    """(text, usable) for one feature.
+
+    The top-level flag says whether the host offers the API in this session. The feature entry's
+    ``available`` is True/False when the host has observed the native service and None ("not
+    observed") otherwise; on a native desktop Core 1.0.3 reports None for these services.
+    None is not False.
+    """
+    if not caps.get(flag):
+        return "not available", False
+    available = caps.get("features", {}).get(FEATURES[flag], {}).get("available")
+    if available is None:
+        return "enabled (not observed)", True
+    return ("available", True) if available else ("unavailable", False)
 
 
 def rows(pairs: list[tuple[str, object]]) -> str:
@@ -65,7 +84,6 @@ class SupportWindow:
 
     def refresh(self) -> dict:
         caps = self.app.capabilities()
-        features = caps.get("features", {})
         prefs = self.app.desktop_preferences()
         host = self.app.host_diagnostics()
         recorder = diagnostics.recorder()
@@ -86,8 +104,9 @@ class SupportWindow:
                 ("CSS profile", caps.get("css_profile")), ("Max windows", caps.get("max_windows")),
                 ("Python", f"{platform.python_implementation()} {platform.python_version()}"),
                 ("SDK", nativehtmlkit.__version__)])},
-            {"op": "replace_children_html", "element": "features", "html": rows(
-                [(name, bool(features.get(name, {}).get("available"))) for name in FEATURES])},
+            {"op": "replace_children_html", "element": "features", "html": "".join(
+                f'<tr><th>{html.escape(flag)}</th><td class="{"yes" if usable else "no"}">{html.escape(text)}</td></tr>'
+                for flag, (text, usable) in ((flag, feature_state(caps, flag)) for flag in FEATURES))},
             {"op": "replace_children_html", "element": "prefs", "html": rows([
                 ("Source", prefs.get("source")), ("Colour scheme", prefs.get("color_scheme")),
                 ("Reduced motion", prefs.get("reduced_motion")), ("High contrast", prefs.get("high_contrast"))])},

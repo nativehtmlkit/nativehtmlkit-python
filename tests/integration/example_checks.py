@@ -318,21 +318,36 @@ def live_chart(app):
     import live_chart as example
 
     chart = example.build(app)
+    doc = chart.document
     with Guard("chart"):
-        frame = example.render([0.0, 0.5, 1.0], chart.background)
+        check("chart.first_sample", len(chart.samples) == 1 and chart.frames == 1)
+        check("chart.legend", doc.get_text("legend").endswith(" MB now, 1 samples"), text=doc.get_text("legend"))
+        check("chart.working_set_positive", example.working_set_mb() > 1)
+        frame = example.render([10.0, 20.0], chart.background)
         check("chart.frame_size", len(frame) == example.WIDTH * example.HEIGHT * 4)
-        top_right = ((0 * example.WIDTH) + example.WIDTH - 1) * 4
-        check("chart.line_pixel_drawn", bytes(frame[top_right:top_right + 4]) == bytes(example.LINE))
-        result = chart.bitmap.present(frame)
+        top = ((example.HEIGHT - 6 - (example.HEIGHT - 12)) * example.WIDTH + example.WIDTH - 1) * 4
+        check("chart.newest_at_right_edge", bytes(frame[top:top + 4]) == example.LINE)
+        check("chart.grid_row", bytes(chart.background[30 * example.WIDTH * 4:30 * example.WIDTH * 4 + 4]) == bytes((225, 229, 236, 255)))
+        thread = chart.start()
+        check("chart.ticks_sample_and_present", _wait(lambda: chart.frames >= 4, 10), frames=chart.frames)
+        result = chart.write_frame()
         check("chart.present_acknowledged", result.get("presented_to_engine") is True, result=result)
-        chart.start()
-        check("chart.producer_presents_frames", _wait(lambda: chart.frames >= 15, 10), frames=chart.frames)
-        check("chart.stats_text_updated", _wait(lambda: chart.document.get_text("frames") != "0"))
-        chart.running.clear()
-        time.sleep(0.3)
+        chart.toggle_pause()
+        check("chart.pause_label", doc.get_text("pause") == "Resume")
+        time.sleep(0.7)
         frames = chart.frames
-        time.sleep(0.3)
-        check("chart.stop_stops_frames", chart.frames == frames)
+        time.sleep(1.2)
+        check("chart.pause_stops_frames", chart.frames == frames)
+        chart.toggle_pause()
+        check("chart.resume_label", doc.get_text("pause") == "Pause")
+        chart.samples[:] = [1.0] * (example.WIDTH + 50)
+        chart.add_sample()
+        check("chart.samples_bounded", len(chart.samples) == example.WIDTH)
+        chart.stopped.set()
+        thread.join(3)
+        chart.bitmap.close()
+        chart.bitmap.close()                  # idempotent
+        check("chart.closed", not thread.is_alive())
     quit_when_ready(app, delay=0.2)
 
 
@@ -689,6 +704,18 @@ def diagnostics(app):
         counters = window.refresh()
         check("diagnostics.no_callback_failures", counters["Callback failures"] == 0, counters=counters)
         check("diagnostics.feature_rows", _count(doc, "#features tr") == len(example.FEATURES))
+        # The shape a native desktop reports (Core 1.0.3): top-level flags True, availability None.
+        native = {flag: True for flag in example.FEATURES}
+        native["features"] = {key: {"available": None} for key in example.FEATURES.values()}
+        check("diagnostics.native_shape_not_reported_unavailable",
+              all(example.feature_state(native, flag) == ("enabled (not observed)", True) for flag in example.FEATURES))
+        native["features"]["incoming_drop"]["available"] = False
+        check("diagnostics.observed_unavailable", example.feature_state(native, "drag_drop") == ("unavailable", False))
+        caps = app.capabilities()
+        check("diagnostics.feature_names_are_host_flags", all(isinstance(caps.get(flag), bool) for flag in example.FEATURES)
+              and all(key in caps["features"] for key in example.FEATURES.values()))
+        expected = "".join(f"{flag}{example.feature_state(caps, flag)[0]}" for flag in example.FEATURES)
+        check("diagnostics.feature_rows_match_capabilities", doc.get_text("features") == expected, text=doc.get_text("features"))
         check("diagnostics.host_rows", _count(doc, "#host tr") == 8 and "linux" in doc.get_text("host")
               or os.name == "nt")
         if _headless(app):

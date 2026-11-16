@@ -105,7 +105,7 @@ class JobRunner:
 
 
 async def amain(app: Application) -> None:
-    window = await asyncio.to_thread(app.open_html, PAGE, title="Async jobs", width=620, height=480)
+    window = await asyncio.to_thread(app.open_html, PAGE, title="Background jobs", width=620, height=480)
     runner = JobRunner(app, window)
     try:
         await runner.adapter.run()                 # until the window is closed / the app quits
@@ -115,7 +115,7 @@ async def amain(app: Application) -> None:
 
 
 def main() -> None:
-    with Application.start(name="Async jobs") as app:
+    with Application.start(name="Background jobs") as app:
         asyncio.run(amain(app))
 
 

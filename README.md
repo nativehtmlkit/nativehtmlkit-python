@@ -52,7 +52,7 @@ Run `python hello.py` or `uv run hello.py`. `Application.start()` launches a sup
 | [file_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/file_viewer.py) | Native Open / Save As / Choose Folder dialogs |
 | [settings_dialog.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/settings_dialog.py) | HTML `<dialog>`, popovers, colour scheme, replaceable stylesheet |
 | [log_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/log_viewer.py) · [checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py) | Background threads, batched updates, cancel |
-| [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py) | Live RGBA bitmap rendered from Python |
+| [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py) | Live RGBA bitmap: memory use of the process, drawn from Python |
 | [async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py) | asyncio tasks, async callbacks |
 | [text_toolbox.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/text_toolbox.py) | Clipboard tool: copy/paste, links, desktop preferences |
 | [data_table.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/data_table.py) · [dom_explorer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/dom_explorer.py) | Rendering data, nodes without ids |

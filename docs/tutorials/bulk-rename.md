@@ -189,7 +189,9 @@ class BulkRename:
         self.plan: list[Row] = []
         self.undo_steps: list[tuple[str, str]] = []
         doc = self.document
-        if not app.capabilities().get("features", {}).get("file_dialogs", {}).get("available"):
+        # The top-level flag says whether the host offers native dialogs in this session.
+        # (features["file_dialogs"]["available"] is None, "not observed", on a native desktop.)
+        if not app.capabilities().get("file_dialogs"):
             doc.set_attribute("browse", "disabled", "")
         # Live preview: every keystroke or checkbox change in the rule form.
         doc.on("input", lambda _event: self.update_preview(), element="rule")
@@ -298,7 +300,9 @@ The capability check in `__init__` disables **Browse...** where the host cannot 
 dialogs (for example in headless test runs):
 
 ```python
-        if not app.capabilities().get("features", {}).get("file_dialogs", {}).get("available"):
+        # The top-level flag says whether the host offers native dialogs in this session.
+        # (features["file_dialogs"]["available"] is None, "not observed", on a native desktop.)
+        if not app.capabilities().get("file_dialogs"):
             doc.set_attribute("browse", "disabled", "")
 ```
 

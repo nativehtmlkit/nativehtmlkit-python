@@ -74,19 +74,28 @@ overrides the host for development.
 ## An About / Support window
 
 [diagnostics.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/diagnostics.py) puts the useful facts in one window: platform,
-renderer and headless state from `app.capabilities()`, which native services are available
-(`capabilities()["features"][name]["available"]`), the desktop preferences, loss counters from
+renderer and headless state from `app.capabilities()`, which native services the host offers and
+whether it has observed them (see below), the desktop preferences, loss counters from
 `app.host_diagnostics()` and the SDK recorder, and a **Save support bundle** button:
 
 ```python
 from nativehtmlkit import diagnostics, export_support_bundle
 
 caps = app.capabilities()
-has_dialogs = caps["features"]["file_dialogs"]["available"]
+offered = caps["file_dialogs"]                     # top-level flag: the API is enabled in this session
+observed = caps["features"]["file_dialogs"]["available"]   # True/False once observed, None before
 host = app.host_diagnostics()                      # dropped_notifications, pending_jobs, ...
 failures = sum(r["event"] == "callback.failed" for r in diagnostics.recorder().history())
 path = export_support_bundle(folder / "support.zip", overwrite=True)   # manifest.json + timeline.jsonl
 ```
+
+Treat `None` as "not observed", never as "unavailable": on a native desktop, Core 1.0.3 reports
+`available: None` for these services (availability is established by the native request itself)
+while the top-level flag is `True`; headless it reports `False` for both. The example's
+`feature_state()` turns the pair into one of "available", "enabled (not observed)",
+"unavailable" or "not available". The top-level flags are `clipboard_text`, `file_dialogs`,
+`external_open`, `drag_drop`, `ime` and `accessibility`; the matching feature entries have the same
+names except `drag_drop`, which is `incoming_drop`.
 
 The bundle is written locally and contains no document text, form values or paths.
 

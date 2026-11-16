@@ -127,8 +127,8 @@ language_specific = false
 [[example]]
 id = "live-chart"
 title = "Live chart"
-summary = "A 30 fps scrolling line chart drawn into a live bitmap."
-teaches = ["create_bitmap", "RGBA frames", "try_present from a producer thread"]
+summary = "A live line chart of memory use drawn into an RGBA bitmap."
+teaches = ["create_bitmap", "RGBA frames", "present from a background thread", "pause"]
 file = "live_chart.py"
 run = "python live_chart.py"
 guide = "live-bitmaps"

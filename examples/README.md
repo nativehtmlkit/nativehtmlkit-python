@@ -52,7 +52,7 @@ python examples/todo.py
 | [log_viewer.py](log_viewer.py) | **Log viewer**: Follows a growing log file with highlighting, pause, clear and auto-scroll. | polling in a background thread, appending lines, trim_children, set_scroll_follow |
 | [checksum.py](checksum.py) | **Checksums**: SHA-256 of every file in a folder, computed in the background with progress, cancel and a quit warning. | worker thread, throttled progress, cooperative cancel, on_before_quit |
 | [async_jobs.py](async_jobs.py) | **Background jobs**: Concurrent jobs with progress bars and cancel buttons. | asyncio tasks, async callbacks, AsyncRpcClient, cancellation |
-| [live_chart.py](live_chart.py) | **Live chart**: A 30 fps scrolling line chart drawn into a live bitmap. | create_bitmap, RGBA frames, try_present from a producer thread |
+| [live_chart.py](live_chart.py) | **Live chart**: A live line chart of memory use drawn into an RGBA bitmap. | create_bitmap, RGBA frames, present from a background thread, pause |
 | [process_dashboard/dashboard.py](process_dashboard/dashboard.py) | **Process dashboard**: Live process monitor that refreshes in the background, with filter, sort, pause and copy. | background thread, thread-safe updates, pause/resume, clipboard |
 | [focus_timer.py](focus_timer.py) | **Focus timer**: A countdown timer that asks before quitting while it runs. | both entry styles, on_before_quit, on_shutdown, request_attention |
 
@@ -124,8 +124,7 @@ running each example unchanged. Examples without a picture here changed after th
 
 | | |
 |---|---|
-| [async_counter](async_counter.py)<br>![async_counter](../docs/images/examples/py-sdk-async_counter.png) | [async_jobs](async_jobs.py)<br>![async_jobs](../docs/images/examples/py-sdk-async_jobs.png) |
-| [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) | [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) |
-| [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) | [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) |
-| [live_chart](live_chart.py)<br>![live_chart](../docs/images/examples/py-sdk-live_chart.png) | [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) |
+| [async_counter](async_counter.py)<br>![async_counter](../docs/images/examples/py-sdk-async_counter.png) | [data_table](data_table.py)<br>![data_table](../docs/images/examples/py-sdk-data_table.png) |
+| [dom_explorer](dom_explorer.py)<br>![dom_explorer](../docs/images/examples/py-sdk-dom_explorer.png) | [file_viewer](file_viewer.py)<br>![file_viewer](../docs/images/examples/py-sdk-file_viewer.png) |
+| [focus_timer](focus_timer.py)<br>![focus_timer](../docs/images/examples/py-sdk-focus_timer.png) | [signup_form](signup_form.py)<br>![signup_form](../docs/images/examples/py-sdk-signup_form.png) |
 | [todo](todo.py)<br>![todo](../docs/images/examples/py-sdk-todo.png) | [window_manager](window_manager.py)<br>![window_manager](../docs/images/examples/py-sdk-window_manager.png) |

@@ -1,73 +1,89 @@
-"""Live chart: draw a scrolling line chart into a LiveBitmap from a background thread.
+"""Live chart: a live line chart drawn into an RGBA bitmap.
 
 What it teaches
-  * ``Document.create_bitmap`` + ``<img src="ui4me-bitmap://ID">`` for pixels you render yourself
+  * ``Document.create_bitmap`` + ``<img src="nativehtmlkit-bitmap://ID">`` for pixels you render
   * the frame format: straight-alpha RGBA8, row-major, ``width * 4`` bytes per row
-  * ``try_present`` from a producer thread (skips a frame instead of queueing when busy)
-  * cheap rendering with pure Python: copy a pre-drawn background, then paint only the line
-  * stopping the producer on shutdown; the bitmap is released with its document
+  * cheap rendering in pure Python: copy a prepared background, then draw short vertical spans
+  * presenting frames from a background thread (``present``), sampling twice per second
+  * pausing, and closing the bitmap (``close`` is idempotent)
+
+The chart shows this Python process's working set (resident memory), sampled twice per second.
 
 Run:  python examples/live_chart.py
 """
 from __future__ import annotations
 
-import collections
-import math
-import random
+import os
+import sys
 import threading
-import time
 
 from nativehtmlkit import Application, NativeHTMLKitError, Window
 
-WIDTH, HEIGHT = 480, 200
-BACKGROUND = (16, 22, 34, 255)
-GRID = (40, 52, 72, 255)
-LINE = (94, 196, 255, 255)
+WIDTH, HEIGHT = 360, 120
+LINE = bytes((50, 104, 216, 255))
 
 PAGE = f"""<!doctype html>
-<html><head><meta charset="utf-8"><style>
-  body {{ margin:0; padding:20px; background:#0b1018; color:#dbe3f0; font:14px sans-serif; }}
-  h1 {{ font-size:18px; margin:0 0 12px; }}
-  img {{ display:block; border:1px solid #2a3850; border-radius:6px; }}
-  .bar {{ display:flex; gap:10px; align-items:center; margin-top:12px; }}
-  button {{ padding:6px 14px; border:1px solid #3a4c6a; border-radius:5px; background:#1a2436; color:#dbe3f0; }}
-  .stats {{ color:#8b98ad; font-family:monospace; }}
+<html><head><style>
+  body {{ font-family: system-ui, sans-serif; margin: 20px; }}
+  img {{ width: {WIDTH}px; height: {HEIGHT}px; border: 1px solid #ccc; display: block; }}
+  #legend {{ font-size: 13px; color: #444; margin-top: 8px; }}
 </style></head>
 <body>
-  <h1>Signal monitor</h1>
-  <img id="chart" src="ui4me-bitmap://chart" width="{WIDTH}" height="{HEIGHT}" alt="Live line chart">
-  <div class="bar">
-    <button id="start">Start</button><button id="stop">Stop</button>
-    <span class="stats">value <b id="value">-</b> · frames <b id="frames">0</b> · skipped <b id="skipped">0</b></span>
-  </div>
+  <h3>Working set of this backend process</h3>
+  <img id="chart" src="nativehtmlkit-bitmap://memory" alt="Memory use over time">
+  <p id="legend" role="status">Starting...</p>
+  <button id="pause">Pause</button>
 </body></html>"""
 
 
+def working_set_mb() -> float:
+    """Resident memory of this process in MB (Linux: /proc/self/statm; Windows: Win32 API)."""
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes import wintypes
+
+        class Counters(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
+                        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t)] + [
+                (name, ctypes.c_size_t) for name in ("QuotaPeakPagedPoolUsage", "QuotaPagedPoolUsage",
+                                                     "QuotaPeakNonPagedPoolUsage", "QuotaNonPagedPoolUsage",
+                                                     "PagefileUsage", "PeakPagefileUsage")]
+        kernel32 = ctypes.WinDLL("kernel32")
+        kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+        counters = Counters(cb=ctypes.sizeof(Counters))
+        process = wintypes.HANDLE(kernel32.GetCurrentProcess())       # a pseudo-handle, no need to close
+        kernel32.K32GetProcessMemoryInfo(process, ctypes.byref(counters), counters.cb)
+        return counters.WorkingSetSize / 2**20
+    with open("/proc/self/statm", encoding="ascii") as handle:
+        return int(handle.read().split()[1]) * os.sysconf("SC_PAGE_SIZE") / 2**20
+
+
 def draw_background() -> bytes:
-    row = bytes(BACKGROUND) * WIDTH
-    grid_row = bytes(GRID) * WIDTH
-    frame = bytearray(row * HEIGHT)
-    for y in range(0, HEIGHT, 40):                     # horizontal grid lines
-        frame[y * WIDTH * 4:(y + 1) * WIDTH * 4] = grid_row
-    for x in range(0, WIDTH, 60):                      # vertical grid lines
-        for y in range(HEIGHT):
-            i = (y * WIDTH + x) * 4
-            frame[i:i + 4] = bytes(GRID)
+    """White with grid lines at rows 30, 60 and 90; every frame starts as a copy of it."""
+    frame = bytearray(b"\xff" * (WIDTH * HEIGHT * 4))
+    grid = bytes((225, 229, 236, 255)) * WIDTH
+    for y in (30, 60, 90):
+        frame[y * WIDTH * 4:(y + 1) * WIDTH * 4] = grid
     return bytes(frame)
 
 
 def render(samples: list[float], background: bytes) -> bytearray:
-    """Samples in [0, 1], newest last; one sample per pixel column."""
+    """Newest sample at the right edge; the line is scaled to the visible minimum and maximum."""
     frame = bytearray(background)
-    pixel = bytes(LINE)
+    if not samples:
+        return frame
+    low, high = min(samples), max(samples)
+    span = max(1.0, high - low)
     previous = None
-    start = WIDTH - len(samples)
-    for column, value in enumerate(samples, start):
-        y = HEIGHT - 1 - int(max(0.0, min(1.0, value)) * (HEIGHT - 1))
-        low, high = (y, y) if previous is None else (min(y, previous), max(y, previous))
-        for row in range(low, high + 1):                # connect to the previous point
-            i = (row * WIDTH + column) * 4
-            frame[i:i + 4] = pixel
+    for i, value in enumerate(samples):
+        x = WIDTH - len(samples) + i
+        y = int((HEIGHT - 6) - ((value - low) / span) * (HEIGHT - 12))
+        if previous is None:
+            previous = y
+        # A vertical span from the previous point keeps the line connected.
+        for row in range(min(previous, y), max(previous, y) + 1):
+            offset = (row * WIDTH + x) * 4
+            frame[offset:offset + 4] = LINE
         previous = y
     return frame
 
@@ -75,55 +91,50 @@ def render(samples: list[float], background: bytes) -> bytearray:
 class LiveChart:
     def __init__(self, window: Window):
         self.document = window.document
-        self.bitmap = self.document.create_bitmap("chart", WIDTH, HEIGHT)
+        # The bitmap belongs to this document; it is released with the document or by close().
+        self.bitmap = self.document.create_bitmap("memory", WIDTH, HEIGHT)
         self.background = draw_background()
-        self.samples: collections.deque[float] = collections.deque(maxlen=WIDTH)
-        self.frames = self.skipped = 0
-        self.running = threading.Event()
+        self.samples: list[float] = []
+        self.frames = 0
+        self.paused = False
         self.stopped = threading.Event()
-        self.document.on("click", lambda _e: self.start(), element="start")
-        self.document.on("click", lambda _e: self.running.clear(), element="stop")
-        self.bitmap.present(self.background)              # first frame: an empty chart
+        self.document.on("click", lambda _event: self.toggle_pause(), element="pause")
 
-    def next_sample(self, t: float) -> float:
-        return 0.5 + 0.3 * math.sin(t * 1.7) + 0.12 * math.sin(t * 7.3) + random.uniform(-0.04, 0.04)
+    def add_sample(self) -> None:
+        mb = working_set_mb()
+        self.samples.append(mb)
+        del self.samples[:-WIDTH]                         # at most one sample per pixel column
+        self.document.set_text("legend", f"{mb:,.1f} MB now, {len(self.samples)} samples")
 
-    def draw_frame(self) -> bool:
-        """Render and offer one frame; False when it was skipped because a present was busy."""
-        result = self.bitmap.try_present(render(list(self.samples), self.background))
-        if result is None:
-            self.skipped += 1
-            return False
+    def write_frame(self) -> dict:
+        result = self.bitmap.present(render(self.samples, self.background))
         self.frames += 1
-        return True
+        return result
 
-    def start(self) -> None:
-        if self.running.is_set():
-            return
-        self.running.set()
-        threading.Thread(target=self._produce, name="chart-producer", daemon=True).start()
+    def toggle_pause(self) -> None:
+        self.paused = not self.paused
+        self.document.set_text("pause", "Resume" if self.paused else "Pause")
 
-    def _produce(self, fps: float = 30.0) -> None:
-        started = time.monotonic()
-        while self.running.is_set() and not self.stopped.is_set():
-            try:
-                self.samples.append(self.next_sample(time.monotonic() - started))
-                self.draw_frame()
-                if self.frames % 10 == 0:                 # text updates are cheaper at a lower rate
-                    self.document.batch([
-                        {"op": "set_text", "element": "value", "text": f"{self.samples[-1]:.3f}"},
-                        {"op": "set_text", "element": "frames", "text": str(self.frames)},
-                        {"op": "set_text", "element": "skipped", "text": str(self.skipped)},
-                    ])
-            except (NativeHTMLKitError, RuntimeError):
-                return       # window closed / shutting down (a closed bitmap raises RuntimeError)
-            time.sleep(1 / fps)
-        self.running.clear()
+    def start(self) -> threading.Thread:
+        def tick() -> None:
+            while not self.stopped.wait(0.5):
+                if self.paused:
+                    continue
+                try:
+                    self.add_sample()
+                    self.write_frame()
+                except (NativeHTMLKitError, RuntimeError):
+                    return            # window closed / shutting down (a closed bitmap raises RuntimeError)
+        thread = threading.Thread(target=tick, name="chart-tick", daemon=True)
+        thread.start()
+        return thread
 
 
 def build(app: Application) -> LiveChart:
-    chart = LiveChart(app.open_html(PAGE, title="Live chart", width=540, height=340))
+    chart = LiveChart(app.open_html(PAGE, title="Live chart", width=440, height=300))
     app.on_shutdown(chart.stopped.set)
+    chart.add_sample()
+    chart.write_frame()
     return chart
 
 

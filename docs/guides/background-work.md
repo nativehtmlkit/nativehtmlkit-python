@@ -117,6 +117,6 @@ If your code is already `async`, run jobs as asyncio tasks and await the SDK thr
 
 - [checksum.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/checksum.py): worker thread, progress, cancel, quit confirmation
 - [log_viewer.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/log_viewer.py): polling a growing file from a thread, bounded view
-- [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py): frame producer
+- [live_chart.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/live_chart.py): sampling and presenting a bitmap from a thread
 - [process_dashboard/dashboard.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/process_dashboard/dashboard.py): periodic refresh, pause, resume
 - [async_jobs.py](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/async_jobs.py): the same idea with asyncio tasks
