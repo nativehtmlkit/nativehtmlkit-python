@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import os
 import tempfile
 import threading
 import time
@@ -383,13 +384,17 @@ async def async_jobs(app):
 
 
 # --------------------------------------------------------------------------- checksum
+# A name that would break the table if not escaped, but is legal on Windows too (no < > there).
+UNSAFE_NAME = "sub/b & <x>.bin" if os.name != "nt" else "sub/b & 'x' &amp;.bin"
+
+
 def checksum(app):
     import checksum as example
 
     tool = example.build(app)
     doc = tool.document
     folder = _scratch()
-    files = {"a.txt": b"alpha", "sub/b <x>.bin": bytes(range(256)) * 4000, "c.md": b""}
+    files = {"a.txt": b"alpha", UNSAFE_NAME: bytes(range(256)) * 4000, "c.md": b""}
     for name, data in files.items():
         (folder / name).parent.mkdir(parents=True, exist_ok=True)
         (folder / name).write_bytes(data)
@@ -400,7 +405,7 @@ def checksum(app):
         expected = {name: hashlib.sha256(data).hexdigest() for name, data in files.items()}
         check("checksum.hashes_correct", tool.results == expected)
         check("checksum.rows_rendered", _count(doc, "#results tr") == 3)
-        check("checksum.names_escaped", "sub/b <x>.bin" in doc.get_text("results"))
+        check("checksum.names_escaped", UNSAFE_NAME in doc.get_text("results"))
         check("checksum.status_done", doc.get_text("status") == "Done: 3 of 3 file(s).", text=doc.get_text("status"))
         check("checksum.progress_full",
               doc.command("get_attribute", element="bar", name="style")["value"] == "width:100%")
