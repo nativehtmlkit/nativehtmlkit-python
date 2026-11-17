@@ -22,7 +22,7 @@ if __name__ == '__main__':
     main()
 ```
 
-`Application.start()` starts a supervised host and reruns the script as its backend; keep side effects inside `main()`, after `start()`. Alternative: `python -m nativehtmlkit run module:setup` imports the module once and calls `setup(app)`, then `app.run()`.
+`Application.start()` starts a supervised host and reruns the script as its backend; keep side effects inside `main()`, after `start()`. Alternative: `uv run -m nativehtmlkit run module:setup` imports the module once and calls `setup(app)`, then `app.run()`.
 
 ## Rules
 

@@ -5,7 +5,7 @@ Never compiles Rust, downloads a host, uploads, tags or publishes anything.
 
     python scripts/package-local.py --out dist/ \\
         --host linux-x64=/path/nativehtmlkit-host=SHA256 \\
-        --host windows-x64=/path/nativehtmlkit-host.exe=SHA256 [--sdist] [--core-version 1.0.2]
+        --host windows-x64=/path/nativehtmlkit-host.exe=SHA256 [--sdist] [--core-version 1.0.3]
 
 For each --host: verify SHA-256 (fail closed), executable format and architecture,
 stage a private copy of the source tree with only that host, build a

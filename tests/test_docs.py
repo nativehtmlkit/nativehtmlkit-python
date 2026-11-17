@@ -67,7 +67,10 @@ def test_python_blocks_parse(page: Path):
 
 def test_public_docs_have_no_private_details():
     pattern = re.compile(r"linuxDEV|winDEV|pvez|pvey|/home/toor|scratchpad|agent-workspaces", re.I)
-    for page in PAGES + [ROOT / "README.md", ROOT / "examples" / "README.md"]:
+    scripts = [p for folder in ("tests", "scripts") for p in sorted((ROOT / folder).rglob("*"))
+               if p.suffix in {".py", ".sh", ".ps1", ".md", ".toml", ".json", ".txt"}
+               and "__pycache__" not in p.parts and p != Path(__file__).resolve()]
+    for page in PAGES + [ROOT / "README.md", ROOT / "examples" / "README.md"] + scripts:
         assert not pattern.search(page.read_text(encoding="utf-8")), page
 
 

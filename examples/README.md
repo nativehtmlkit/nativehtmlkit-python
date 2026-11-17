@@ -112,7 +112,7 @@ headless mode (`NATIVEHTMLKIT_TEST_MODE=1`) and on systems without those service
   an entry has no check.
 
 ```bash
-NATIVEHTMLKIT_HOST_BINARY=/path/to/nativehtmlkit-host python -m pytest tests/integration
+NATIVEHTMLKIT_HOST_BINARY=/path/to/nativehtmlkit-host uv run --no-project --with pytest --with pytest-timeout pytest tests/integration
 ```
 
 Headless mode has no synthetic pointer or keyboard input; clicks, typing and native dialogs are

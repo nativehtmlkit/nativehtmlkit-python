@@ -4,7 +4,7 @@ The `pyproject.toml` package uses setuptools. This project has a nonstandard but
 
 ```bash
 bash scripts/test-local.sh                       # unit and fake-host suite (scripts/test-local.ps1 on Windows)
-NATIVEHTMLKIT_HOST_BINARY=/path/to/nativehtmlkit-host python -m pytest tests/integration   # real host, headless
+NATIVEHTMLKIT_HOST_BINARY=/path/to/nativehtmlkit-host uv run --no-project --with pytest --with pytest-timeout pytest tests/integration   # real host, headless
 python3 scripts/package-local.py --help
 ```
 
