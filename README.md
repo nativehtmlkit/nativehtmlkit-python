@@ -62,7 +62,7 @@ Run `uv run hello.py`. `Application.start()` launches a supervised host and re-e
 
 All [21 examples](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/examples/README.md) are started and checked against the real host by the test suite.
 
-For layouts, reactive state and reusable controls, use the separate [Python UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui) rather than inventing new SDK surface.
+The SDK is not a UI component library: you write the HTML and CSS. Development is currently focused on [Core](https://github.com/nativehtmlkit/nativehtmlkit-core); see [Project status](https://nativehtmlkit.github.io/status/).
 
 ## Learn more
 

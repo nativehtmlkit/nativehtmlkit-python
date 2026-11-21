@@ -24,6 +24,4 @@ uv run -m nativehtmlkit run focus_timer:setup   # host-first runner, setup(app)
 The public showcase repository has a guided gallery covering several features in one window:
 [examples/python-sdk/gallery.py](https://github.com/nativehtmlkit/nativehtmlkit/blob/main/examples/python-sdk/gallery.py).
 
-The Python UI library is separate: it offers reactive controls built on the public SDK, whereas the
-SDK gives direct control of documents, windows and events. See the
-[UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui).
+The SDK gives direct control of documents, windows and events; you write the HTML and CSS.

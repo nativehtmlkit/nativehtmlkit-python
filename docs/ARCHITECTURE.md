@@ -199,6 +199,5 @@ host. See [BUILD.md](BUILD.md).
 ## Boundaries
 
 The SDK speaks only the public Core wire protocol v1; it imports no Core internals. Reusable
-components, layouts and reactive state belong to the separate
-[Python UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui), which uses only this SDK's
+components and reactive state are not part of the SDK; a layer for them must use only this SDK's
 public API.

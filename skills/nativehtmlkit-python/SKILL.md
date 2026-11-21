@@ -5,7 +5,7 @@ description: Build native HTML/CSS desktop applications using the public NativeH
 
 # NativeHTMLKit Python SDK
 
-Use the `nativehtmlkit` package (0.1.2, Python 3.10+; wheels for Linux x64 glibc 2.39+ and Windows x64). Check the SDK version, host compatibility and target desktop first (`nativehtmlkit-python version`). This skill is for **SDK** objects (`Application`, `Window`, `Document`, `Node`), not the reactive UI library.
+Use the `nativehtmlkit` package (0.1.2, Python 3.10+; wheels for Linux x64 glibc 2.39+ and Windows x64). Check the SDK version, host compatibility and target desktop first (`nativehtmlkit-python version`). This skill is for **SDK** objects (`Application`, `Window`, `Document`, `Node`).
 
 ## First window
 
@@ -39,4 +39,4 @@ if __name__ == '__main__':
 
 ## Architecture guardrails
 
-Never import SDK private modules (`_bootstrap`, ...), access Core Rust internals, call a CLI as the transport, add a browser/JS server, or change Core from an SDK task. For components and reactive state, use the separate `nativehtmlkit-ui-python` skill. See [examples](references/examples.md), the [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) and the [how-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md).
+Never import SDK private modules (`_bootstrap`, ...), access Core Rust internals, call a CLI as the transport, add a browser/JS server, or change Core from an SDK task. See [examples](references/examples.md), the [API reference](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/API.md) and the [how-to guides](https://github.com/nativehtmlkit/nativehtmlkit-python/blob/main/docs/guides/README.md).

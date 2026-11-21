@@ -123,7 +123,6 @@ exercised on a real desktop.
 - [Getting started](../docs/getting-started.md), [how-to guides](../docs/guides/README.md) and
   [API reference](../docs/API.md)
 - The [public gallery demo](https://github.com/nativehtmlkit/nativehtmlkit/tree/main/examples/python-sdk)
-- For reusable components and reactive state, the [Python UI library](https://github.com/nativehtmlkit/nativehtmlkit_ui)
 
 ## Screenshots
 
